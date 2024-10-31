@@ -5,6 +5,8 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Windowing.Desktop;
 using Sauce_Engine;
+using Sauce_Engine.Types;
+using Sauce_Engine.Util;
 
 namespace Sauce_Engine;
 
@@ -58,16 +60,16 @@ public class Window : GameWindow
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
 
-    private readonly Vector3[] _cubePositions =
-    {
-        new Vector3(0.0f, 0.0f, 0.0f),
-    };
+    private MapObjList mapObjects = MapObjList.Instance;
 
     // We need the point lights' positions to draw the lamps and to get light the materials properly
     // MUST ADJUST THE PREPROCESSOR DIRECTIVE NR_POINT_LIGHTS TO LIGHT COUNT
     private readonly Vector3[] _pointLightPositions =
     {
         new Vector3(0.7f, 0.2f, 2.0f),
+        new Vector3(10, 10, 10),
+        new Vector3(5, -10, 10),
+        new Vector3(10, -10, -10),
     };
 
     private int _vertexBufferObject;
@@ -137,7 +139,7 @@ public class Window : GameWindow
         }
 
         _diffuseMap = Texture.LoadFromFile("Resources/glass.jpg");
-        _specularMap = Texture.LoadFromFile("Resources/glass spec.jpg");
+        _specularMap = Texture.LoadFromFile("Resources/glass.jpg");
 
         _camera = new Camera(Vector3.UnitZ * 3, Size.X / (float)Size.Y);
 
@@ -179,15 +181,21 @@ public class Window : GameWindow
         _lightingShader.SetVector3("dirLight.specular", new Vector3(0.5f, 0.5f, 0.5f));
 
         // Point lights
-        for (int i = 0; i < _pointLightPositions.Length; i++)
+        //TODO: make sure the point light work and crap
+        int i=0;
+        foreach (var obj in mapObjects)
         {
-            _lightingShader.SetVector3($"pointLights[{i}].position", _pointLightPositions[i]);
+            if(obj is Entity ent)
+            {
+            _lightingShader.SetVector3($"pointLights[{i}].position", ent.transform.Translation.ToGlVec3());
             _lightingShader.SetVector3($"pointLights[{i}].ambient", new Vector3(0.05f, 0.05f, 0.05f));
             _lightingShader.SetVector3($"pointLights[{i}].diffuse", new Vector3(0.8f, 0.8f, 0.8f));
             _lightingShader.SetVector3($"pointLights[{i}].specular", new Vector3(1.0f, 1.0f, 1.0f));
             _lightingShader.SetFloat($"pointLights[{i}].constant", 1.0f);
             _lightingShader.SetFloat($"pointLights[{i}].linear", 0.09f);
             _lightingShader.SetFloat($"pointLights[{i}].quadratic", 0.032f);
+            i++;
+            }
         }
 
         // Spot light
@@ -202,6 +210,7 @@ public class Window : GameWindow
         _lightingShader.SetFloat("spotLight.cutOff", MathF.Cos(MathHelper.DegreesToRadians(12.5f)));
         _lightingShader.SetFloat("spotLight.outerCutOff", MathF.Cos(MathHelper.DegreesToRadians(17.5f)));
 
+        /*
         for (int i = 0; i < _cubePositions.Length; i++)
         {
             Matrix4 model = Matrix4.CreateTranslation(_cubePositions[i]);
@@ -212,6 +221,17 @@ public class Window : GameWindow
 
             GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
         }
+        */
+
+        foreach(var mapobj in mapObjects)
+        {
+            if(mapobj is Brush b)
+            {
+                Matrix4 model = b.transform.GetMat().ToGLMat4();
+                _lightingShader.SetMatrix4("model", model);
+                GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            }
+        }
 
         GL.BindVertexArray(_vaoLamp);
 
@@ -219,7 +239,20 @@ public class Window : GameWindow
 
         _lampShader.SetMatrix4("view", _camera.GetViewMatrix());
         _lampShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
+
+        /*
+        foreach(var mapobj in mapObjects)
+        {
+            if(mapobj is Entity ent)
+            {
+                Matrix4 model = ent.transform.GetMat().ToGLMat4();
+                _lampShader.SetMatrix4("model", model);
+                GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            
+            }
+        }*/
         // We use a loop to draw all the lights at the proper position
+        /*
         for (int i = 0; i < _pointLightPositions.Length; i++)
         {
             Matrix4 lampMatrix = Matrix4.CreateScale(0.2f);
@@ -229,6 +262,7 @@ public class Window : GameWindow
 
             GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
         }
+        */
 
         SwapBuffers();
     }

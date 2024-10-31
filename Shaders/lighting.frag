@@ -28,7 +28,7 @@ struct PointLight {
     vec3 specular;
 };
 //We have a total of 4 point lights now, so we define a preprossecor directive to tell the gpu the size of our point light array
-#define NR_POINT_LIGHTS 1
+#define NR_POINT_LIGHTS 4
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 //This is our spotlight where we need the position, attenuation along with the cutoff and the outer cutoff. Plus the direction of the light
 struct SpotLight{
