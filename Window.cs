@@ -12,7 +12,7 @@ namespace Sauce_Engine;
 
 // In this tutorial we focus on how to set up a scene with multiple lights, both of different types but also
 // with several point lights
-public class Window : GameWindow
+public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : GameWindow(gameWindowSettings, nativeWindowSettings)
 {
     private readonly float[] _vertices =
     {
@@ -81,14 +81,11 @@ public class Window : GameWindow
 
     private Camera _camera;
 
+    private Movement movement;
+
     private bool _firstMove = true;
 
     private Vector2 _lastPos;
-
-    public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
-        : base(gameWindowSettings, nativeWindowSettings)
-    {
-    }
 
     protected override void OnLoad()
     {
@@ -131,12 +128,14 @@ public class Window : GameWindow
             GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
         }
 
-        _diffuseMap = Texture.LoadFromFile("Resources/container2.png");
-        _specularMap = Texture.LoadFromFile("Resources/container2_specular.png");
+        _diffuseMap = Texture.LoadFromFile("Resources/outer tile.png");
+        _specularMap = Texture.LoadFromFile("Resources/outer tile spec.png");
 
         _camera = new Camera(Vector3.UnitZ * 3, Size.X / (float)Size.Y);
 
         CursorState = CursorState.Grabbed;
+
+        movement = new(_camera, mapObjects);
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -251,49 +250,20 @@ public class Window : GameWindow
     }
 
 
-    const float gravity = -9.8f;
+
     protected override void OnUpdateFrame(FrameEventArgs e)
     {
         base.OnUpdateFrame(e);
-
-        if (!IsFocused)
-        {
-            return;
-        }
-
+        if (!IsFocused) return;
         var input = KeyboardState;
+        if (input.IsKeyDown(Keys.Escape)) Close();
 
-        if (input.IsKeyDown(Keys.Escape))
-        {
-            Close();
-        }
+        movement.Process(input, e);
+        // Just making sure the player never falls OOB
+        if (_camera.Position.Y < -50) _camera.Position = new(0, 10, 0);
 
-        const float cameraSpeed = 5f;
-        const float sensitivity = 0.2f;
-        Vector3 velocity = new();
-
-        var flatFront = _camera.Front;
-        var flatRight = _camera.Right;
-        flatFront.Y = 0;
-        flatFront.Normalize();
-        flatRight.Y = 0;
-        flatRight.Normalize();
-
-        if (input.IsKeyDown(Keys.W)) velocity += flatFront * cameraSpeed;
-        if (input.IsKeyDown(Keys.S)) velocity -= flatFront * cameraSpeed;
-        if (input.IsKeyDown(Keys.A)) velocity -= flatRight * cameraSpeed ;
-        if (input.IsKeyDown(Keys.D)) velocity += flatRight * cameraSpeed;
-        if (input.IsKeyDown(Keys.Space)) velocity += new Vector3(0, 1, 0) * cameraSpeed * 5;
-        // if (input.IsKeyDown(Keys.LeftShift)) velocity -= _camera.Up * cameraSpeed * new Vector3(1, 0, 1);
-
-        // TODO: check groundednes
-        bool Grounded = ComputeCollision(_camera.Position, new Vector3(0, -1, 0));
-        if(!Grounded) velocity.Y += gravity;
-        
-
-
-        _camera.Position += velocity * (float)e.Time;
-
+        // Camera and movement stuff
+        const float sensitivity = 0.2f;     
         var mouse = MouseState;
 
         if (_firstMove)
@@ -325,45 +295,5 @@ public class Window : GameWindow
 
         GL.Viewport(0, 0, Size.X, Size.Y);
         _camera.AspectRatio = Size.X / (float)Size.Y;
-    }
-
-
-
-    const float cBound = .5f;
-    const float playerHeight = 2;
-    bool ComputeCollision(Vector3 position, Vector3 velocity)
-    {
-        var normal = velocity.Normalized();
-        foreach (var obj in mapObjects)
-        {
-            if(obj is Brush brush)
-            {
-                Matrix4 trans = brush.transform.GetMat().ToGLMat4();
-                Matrix4 arcTrans = trans.Inverted();
-
-                var localPos = Multiply(arcTrans, position);
-                var localVel = Multiply(arcTrans, velocity);
-
-                for (float i = 0; i <= 1; i += .01f)
-                {
-                    var sample = localPos + i * localVel;
-                    bool xInBounds = sample.X > -cBound && sample.X < cBound;
-                    bool yInBounds = sample.Y - (playerHeight/brush.GetScale.Y) > -cBound && sample.Y - (playerHeight/brush.GetScale.Y) < cBound;
-                    bool zInBounds = sample.Z > -cBound && sample.Z < cBound;
-                    if (xInBounds && yInBounds && zInBounds) return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    Vector3 Multiply(Matrix4 m, Vector3 rhs)
-    {
-        Vector4 res = new();
-        res.X = m.M11 * rhs.X + m.M12 * rhs.Y + m.M13 * rhs.Z + m.M14;
-        res.Y = m.M21 * rhs.X + m.M22 * rhs.Y + m.M23 * rhs.Z + m.M24;
-        res.Z = m.M31 * rhs.X + m.M32 * rhs.Y + m.M33 * rhs.Z + m.M34;
-        res.W = m.M41 * rhs.X + m.M42 * rhs.Y + m.M43 * rhs.Z + m.M44;
-        return new (res.X/res.W, res.Y/res.W, res.Z/res.W);
     }
 }

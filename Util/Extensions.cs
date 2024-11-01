@@ -37,4 +37,10 @@ public static class Extensions
 	}
 
 	public static OpenTK.Mathematics.Vector3 ToGlVec3(this System.Numerics.Vector3 vec) => new(vec.X, vec.Y, vec.Z);
+	public static float Clamp(this float val, float floor, float ceil)
+	{
+		if (val < floor) return floor;
+		if (val > ceil) return ceil;
+		return val;
+	}
 }
