@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using Sauce_Engine.Enums;
 using Sauce_Engine.Types;
 using Sauce_Engine.Util;
 
@@ -66,9 +68,14 @@ public static class Deserializer
 		
 		System.Numerics.Vector3? translation = new(numbers[0].ToFloat(), numbers[1].ToFloat(), numbers[2].ToFloat());
 		System.Numerics.Vector3 rotation = new(numbers[3].ToFloat(), numbers[4].ToFloat(), numbers[5].ToFloat());
-		System.Numerics.Vector3 scale = new(numbers[6].ToFloat(), numbers[7].ToFloat(), numbers[8].ToFloat());
+		Enums.EntityType type = numbers[6] switch
+        {
+            "Omni" => EntityType.OmniLight,
+            "Spot" => EntityType.DirectLight,
+            _ => throw new NotImplementedException(),
+        };
 		
-		var ret = new Entity(Enums.EntityType.OmniLight);
+		var ret = new Entity(type);
 		ret.TranslateTo(translation.Value);
 		ret.RotateTo(rotation);
 		return ret;

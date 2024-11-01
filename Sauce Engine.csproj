@@ -19,9 +19,19 @@
       <None Update="Shaders\**\*">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+
       <None Update="Resources\**\*">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+
+      <None Update="ficon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+
+      <None Update="exported_data.map">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+
     </ItemGroup>
 
 </Project>

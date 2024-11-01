@@ -1,11 +1,14 @@
 #version 330 core
+
 //In this tutorial it might seem like a lot is going on, but really we just combine the last tutorials, 3 pieces of source code into one
 //and added 3 extra point lights.
+
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
     float     shininess;
 };
+
 //This is the directional light struct, where we only need the directions
 struct DirLight {
     vec3 direction;
@@ -14,7 +17,9 @@ struct DirLight {
     vec3 diffuse;
     vec3 specular;
 };
+
 uniform DirLight dirLight;
+
 //This is our pointlight where we need the position aswell as the constants defining the attenuation of the light.
 struct PointLight {
     vec3 position;
@@ -27,9 +32,11 @@ struct PointLight {
     vec3 diffuse;
     vec3 specular;
 };
+
 //We have a total of 4 point lights now, so we define a preprossecor directive to tell the gpu the size of our point light array
 #define NR_POINT_LIGHTS 4
 uniform PointLight pointLights[NR_POINT_LIGHTS];
+
 //This is our spotlight where we need the position, attenuation along with the cutoff and the outer cutoff. Plus the direction of the light
 struct SpotLight{
     vec3  position;
@@ -45,7 +52,9 @@ struct SpotLight{
     float linear;
     float quadratic;
 };
-uniform SpotLight spotLight;
+
+#define NR_SPOT_LIGHTS 1
+uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 
 uniform Material material;
 uniform vec3 viewPos;
@@ -71,11 +80,14 @@ void main()
 
     //phase 1: Directional lighting
     vec3 result = CalcDirLight(dirLight, norm, viewDir);
+
     //phase 2: Point lights
     for(int i = 0; i < NR_POINT_LIGHTS; i++)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+
     //phase 3: Spot light
-    result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
+    for(int i = 0; i < NR_SPOT_LIGHTS; i++)
+        result += CalcSpotLight(spotLights[i], norm, FragPos, viewDir);    
 
     FragColor = vec4(result, 1.0);
 }
