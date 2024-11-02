@@ -5,11 +5,13 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using Sauce_Engine;
 using Sauce_Engine.Types;
 using Sauce_Engine.Util;
+using Vec3 = System.Numerics.Vector3;
 
 class Movement
 {
     Camera cam;
     MapObjList objs;
+    public MapObjList imObjList;
     const float gravity = -9.8f;
     const float cameraSpeed = 10f * 10f;
     const float airControlPenalty = .9f;
@@ -29,8 +31,6 @@ class Movement
         Vector3 Acceleration = new(0, gravity, 0);
 
         float airControl;
-
-        // TODO: check groundednes
         bool Grounded = ComputeCollision(cam.Position, new Vector3(0, -1, 0));
 
         if(Grounded) 
@@ -58,12 +58,12 @@ class Movement
         if (input.IsKeyDown(Keys.S)) Acceleration -= flatFront * cameraSpeed * airControl;
         if (input.IsKeyDown(Keys.A)) Acceleration -= flatRight * cameraSpeed * airControl;
         if (input.IsKeyDown(Keys.D)) Acceleration += flatRight * cameraSpeed * airControl;
-        if (input.IsKeyDown(Keys.Space) && Grounded) Acceleration += new Vector3(0, 1, 0) * 5 / (float)e.Time;
-        // if (input.IsKeyDown(Keys.LeftShift)) velocity -= _camera.Up * cameraSpeed * new Vector3(1, 0, 1);
+        if (input.IsKeyDown(Keys.Space) && Grounded) Acceleration += new Vector3(0, 1, 0) * 10f / (float)e.Time;
+        if (input.IsKeyDown(Keys.LeftShift)) Acceleration -= new Vector3(0, 1, 0) * 5 / (float)e.Time;
 
-        //Velocity.X = Velocity.X.Clamp(-3, 3);
-        //Velocity.Y = Velocity.Y.Clamp(-30, 30);
-        //Velocity.Z = Velocity.Z.Clamp(-3, 3);
+        Velocity.X = Velocity.X.Clamp(-10, 10);
+        Velocity.Y = Velocity.Y.Clamp(-30, 30);
+        Velocity.Z = Velocity.Z.Clamp(-10, 10);
 
 
         Velocity += Acceleration * (float)e.Time;
@@ -76,47 +76,57 @@ class Movement
         }
         else
         {
-            Velocity.X *= .99f;
-            Velocity.Z *= .99f;
+            //Velocity.X *= .99f;
+            //Velocity.Z *= .99f;
         }
 
         //Console.WriteLine($"X:{Velocity.X:F2} Y:{Velocity.Y:F2} Z:{Velocity.Z:F2}");
     }
 
     const float cBound = .5f;
-    const float cLowBound = -1f;
-    const float cHighBound = 1f;
+    const float cLowBound = -.5f;
+    const float cHighBound = .5f;
     const float playerHeight = 2;
     bool ComputeCollision(Vector3 position, Vector3 direction)
     {
+        bool CollisionFound = false;
         foreach (var obj in objs)
         {
             if(obj is Brush brush)
             {
-                Matrix4 trans = brush.MakeGlModelMat();
+                Transform transf = new Transform(brush.transform);
+                transf.RotateTo(new (-transf.Rotation.X, -transf.Rotation.Y, -transf.Rotation.Z));
+                Matrix4 trans = transf.GetMat().ToGLMat4();
                 Matrix4 arcTrans = trans.Inverted();
-                Matrix4x4 refmat = brush.transform.GetMat();
-                var sss = refmat.ToGLMat4();
 
                 var localPos = Multiply(arcTrans, position);
                 var localVel = Multiply(arcTrans, direction);
+
+                for(float i=-.5f; i<1; i++)
+                for(float j=-.5f; j<1; j++)
+                for(float k=-.5f; k<1; k++)
+                {
+                    Vector3 point = new(i, j, k);
+                    point = Multiply(trans, point);
+                    DrawMarker(point);
+                }
 
                 for (float i = 0; i <= 1; i += .01f)
                 {
                     var sample = localPos + i * localVel;
                     bool xInBounds = sample.X > cLowBound && sample.X < cHighBound;
-                    //bool yInBounds = sample.Y - (playerHeight/brush.GetScale.Y) > cLowBound && sample.Y - (playerHeight/brush.GetScale.Y) < cHighBound;
+                    bool yInBounds = sample.Y - (playerHeight/brush.GetScale.Y) > cLowBound && sample.Y - (playerHeight/brush.GetScale.Y) < cHighBound;
                     bool zInBounds = sample.Z > cLowBound && sample.Z < cHighBound;
-                    if (xInBounds && true && zInBounds) 
+                    if (xInBounds && yInBounds && zInBounds) 
                     {
                         sample = Multiply(trans, sample);
-                        Console.WriteLine($"Collision at X:{sample.X:F2} Y:{sample.Y:F2} Z:{sample.Z:F2}");
-                        return true;
+                        //DrawMarker(sample);
+                        CollisionFound = true;
                     }
                 }
             }
         }
-        return false;
+        return CollisionFound;
     }
 
     Vector3 Multiply(Matrix4 m, Vector3 rhs)
@@ -127,5 +137,10 @@ class Movement
         res.Z = m.M31 * rhs.X + m.M32 * rhs.Y + m.M33 * rhs.Z + m.M34;
         res.W = m.M41 * rhs.X + m.M42 * rhs.Y + m.M43 * rhs.Z + m.M44;
         return new (res.X/res.W, res.Y/res.W, res.Z/res.W);
+    }
+
+    void DrawMarker(Vector3 Location, float Size = .2f)
+    {
+        imObjList.AddMapObject(new Brush(new Transform(Vec3.Zero, Location.ToSysVec3(), new Vec3(Size, Size, Size))));
     }
 }

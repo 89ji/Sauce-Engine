@@ -33,6 +33,17 @@ public class Transform
         Scale = Vector3.One;
     }
 
+    public Transform(Transform original)
+    {
+        var oR = original.Rotation;
+        var oT = original.Translation;
+        var oS = original.Scale;
+
+        Rotation = new Vector3(oR.X, oR.Y, oR.Z);
+        Translation = new Vector3(oT.X, oT.Y, oT.Z);
+        Scale = new(oS.X, oS.Y, oS.Z);
+    }
+
     public void TranslateBy(Vector3 translation)
     {
         isMatCurrent = false;
@@ -117,7 +128,8 @@ public class Transform
                 sin, cos, 0, 0,
                 0, 0, 1, 0,
                 0, 0, 0, 1
-            )
+            ),
+            _ => throw new NotImplementedException()
         };
     }
 }

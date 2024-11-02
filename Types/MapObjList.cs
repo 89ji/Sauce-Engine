@@ -9,7 +9,8 @@ public class MapObjList : IEnumerable<MapObject>
 	public static readonly MapObjList Instance = new();
 	List<MapObject> brushes = new();
 
-	private MapObjList()
+	[Obsolete("Use the singleton instance instead when needed")]
+	public MapObjList()
 	{
 	}
 

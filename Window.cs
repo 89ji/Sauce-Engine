@@ -61,7 +61,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
     };
 
     private MapObjList mapObjects = MapObjList.Instance;
-    private MapObjList imObjects = 
+    private MapObjList imObjects = new();
 
     // We need the point lights' positions to draw the lamps and to get light the materials properly
     // MUST ADJUST THE PREPROCESSOR DIRECTIVE NR_POINT_LIGHTS TO LIGHT COUNT
@@ -137,6 +137,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
         CursorState = CursorState.Grabbed;
 
         movement = new(_camera, mapObjects);
+        movement.imObjList = imObjects;
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -237,6 +238,18 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
 
             }
         }
+
+        // Drawing the immidiate brushes before disposing of them
+        foreach(var mapobj in imObjects)
+        {
+            if (mapobj is Brush b)
+            {
+                Matrix4 model = b.MakeGlModelMat();
+                _lightingShader.SetMatrix4("model", model);
+                GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            }
+        }
+        imObjects.Clear();
 
         SwapBuffers();
     }
