@@ -10,6 +10,8 @@ public static class Extensions
 	public static float toDeg(this float radians) => radians * 180f / MathF.PI;
 	public static float toRad(this float degrees) => degrees / 180f * MathF.PI;
 	public static float ToFloat(this string num) => float.Parse(num);
+
+	[Obsolete("Use MapObject's MakeGlModelMat() instead.")]
 	public static Matrix4 ToGLMat4(this Matrix4x4 mat)
 	{
 		var ret = new Matrix4();

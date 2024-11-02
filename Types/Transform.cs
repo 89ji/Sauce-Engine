@@ -70,13 +70,10 @@ public class Transform
         if(isMatCurrent) return Matrix;
         isMatCurrent = true;
 
-        Matrix4x4 rotationX = new();
-        //rotationX.M11 = MathF.Cos(Rotation.X);
-
         Matrix4x4 composedRotation =
-        ConstructRotationMatrix(Rotation.Z, Dimension.Z) *
+        ConstructRotationMatrix(Rotation.Y, Dimension.Y) *
         ConstructRotationMatrix(Rotation.X, Dimension.X) *
-        ConstructRotationMatrix(Rotation.Y, Dimension.Y);
+        ConstructRotationMatrix(Rotation.Z, Dimension.Z);
 
         Matrix4x4 composedScale = new (
             Scale.X, 0, 0, 0,

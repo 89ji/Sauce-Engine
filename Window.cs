@@ -61,6 +61,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
     };
 
     private MapObjList mapObjects = MapObjList.Instance;
+    private MapObjList imObjects = 
 
     // We need the point lights' positions to draw the lamps and to get light the materials properly
     // MUST ADJUST THE PREPROCESSOR DIRECTIVE NR_POINT_LIGHTS TO LIGHT COUNT
@@ -170,7 +171,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
         _lightingShader.SetVector3("dirLight.direction", new Vector3(-0.2f, -1.0f, -0.3f));
         _lightingShader.SetVector3("dirLight.ambient", new Vector3(0.05f, 0.05f, 0.05f));
         _lightingShader.SetVector3("dirLight.diffuse", new Vector3(0.4f, 0.4f, 0.4f));
-        _lightingShader.SetVector3("dirLight.specular", new Vector3(0.5f, 0.5f, 0.5f));
+        _lightingShader.SetVector3("dirLight.specular", new Vector3(0.1f, 0.1f, 0.1f));
 
         // Setting the point and spot lights
         int oLightCt = 0;
@@ -212,12 +213,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
         {
             if (mapobj is Brush b)
             {
-                Matrix4 model = Matrix4.CreateScale(b.GetScale.ToGlVec3());
-                model *= Matrix4.CreateRotationX(b.GetRotation.X);
-                model *= Matrix4.CreateRotationX(b.GetRotation.Y);
-                model *= Matrix4.CreateRotationX(b.GetRotation.Z);
-                model *= Matrix4.CreateTranslation(b.GetTranslate.ToGlVec3());
-
+                Matrix4 model = b.MakeGlModelMat();
                 _lightingShader.SetMatrix4("model", model);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
             }
@@ -235,11 +231,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
         {
             if (mapobj is Entity ent)
             {
-                Matrix4 model = Matrix4.CreateScale(.2f);
-                model *= Matrix4.CreateRotationX(ent.GetRotation.X);
-                model *= Matrix4.CreateRotationX(ent.GetRotation.Y);
-                model *= Matrix4.CreateRotationX(ent.GetRotation.Z);
-                model *= Matrix4.CreateTranslation(ent.GetTranslate.ToGlVec3());
+                Matrix4 model = ent.MakeGlModelMat();
                 _lampShader.SetMatrix4("model", model);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
 

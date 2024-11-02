@@ -1,3 +1,4 @@
+using Matrix4x4 = System.Numerics.Matrix4x4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -10,8 +11,8 @@ class Movement
     Camera cam;
     MapObjList objs;
     const float gravity = -9.8f;
-    const float cameraSpeed = 2.5f * 10f;
-    const float airControlPenalty = .1f;
+    const float cameraSpeed = 10f * 10f;
+    const float airControlPenalty = .9f;
 
 
 
@@ -24,6 +25,7 @@ class Movement
 
     public void Process(KeyboardState input, FrameEventArgs e)
     {
+        Console.Clear();
         Vector3 Acceleration = new(0, gravity, 0);
 
         float airControl;
@@ -34,12 +36,14 @@ class Movement
         if(Grounded) 
         {
             Velocity.Y = 0;
+            Acceleration.Y = 0;
             airControl = 1;
         }
         else
         {
             airControl = airControlPenalty;
         }
+        Console.WriteLine($"Grounded: {Grounded}");
         
         // Eliminate flying from the cameras range of movement
         var flatFront = cam.Front;
@@ -61,6 +65,7 @@ class Movement
         //Velocity.Y = Velocity.Y.Clamp(-30, 30);
         //Velocity.Z = Velocity.Z.Clamp(-3, 3);
 
+
         Velocity += Acceleration * (float)e.Time;
         cam.Position += Velocity * (float)e.Time;
 
@@ -75,10 +80,12 @@ class Movement
             Velocity.Z *= .99f;
         }
 
-        Console.WriteLine($"X:{Velocity.X:F2} Y:{Velocity.Y:F2} Z:{Velocity.Z:F2}");
+        //Console.WriteLine($"X:{Velocity.X:F2} Y:{Velocity.Y:F2} Z:{Velocity.Z:F2}");
     }
 
     const float cBound = .5f;
+    const float cLowBound = -1f;
+    const float cHighBound = 1f;
     const float playerHeight = 2;
     bool ComputeCollision(Vector3 position, Vector3 direction)
     {
@@ -86,8 +93,10 @@ class Movement
         {
             if(obj is Brush brush)
             {
-                Matrix4 trans = brush.transform.GetMat().ToGLMat4();
+                Matrix4 trans = brush.MakeGlModelMat();
                 Matrix4 arcTrans = trans.Inverted();
+                Matrix4x4 refmat = brush.transform.GetMat();
+                var sss = refmat.ToGLMat4();
 
                 var localPos = Multiply(arcTrans, position);
                 var localVel = Multiply(arcTrans, direction);
@@ -95,10 +104,15 @@ class Movement
                 for (float i = 0; i <= 1; i += .01f)
                 {
                     var sample = localPos + i * localVel;
-                    bool xInBounds = sample.X > -cBound && sample.X < cBound;
-                    bool yInBounds = sample.Y - (playerHeight/brush.GetScale.Y) > -cBound && sample.Y - (playerHeight/brush.GetScale.Y) < cBound;
-                    bool zInBounds = sample.Z > -cBound && sample.Z < cBound;
-                    if (xInBounds && yInBounds && zInBounds) return true;
+                    bool xInBounds = sample.X > cLowBound && sample.X < cHighBound;
+                    //bool yInBounds = sample.Y - (playerHeight/brush.GetScale.Y) > cLowBound && sample.Y - (playerHeight/brush.GetScale.Y) < cHighBound;
+                    bool zInBounds = sample.Z > cLowBound && sample.Z < cHighBound;
+                    if (xInBounds && true && zInBounds) 
+                    {
+                        sample = Multiply(trans, sample);
+                        Console.WriteLine($"Collision at X:{sample.X:F2} Y:{sample.Y:F2} Z:{sample.Z:F2}");
+                        return true;
+                    }
                 }
             }
         }
