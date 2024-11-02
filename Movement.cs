@@ -83,9 +83,9 @@ class Movement
         //Console.WriteLine($"X:{Velocity.X:F2} Y:{Velocity.Y:F2} Z:{Velocity.Z:F2}");
     }
 
-    const float cBound = .5f;
     const float cLowBound = -.5f;
     const float cHighBound = .5f;
+    const float cPadding = .5f;
     const float playerHeight = 2;
     bool ComputeCollision(Vector3 position, Vector3 direction)
     {
@@ -102,25 +102,29 @@ class Movement
                 var localPos = Multiply(arcTrans, position);
                 var localVel = Multiply(arcTrans, direction);
 
-                for(float i=-.5f; i<1; i++)
-                for(float j=-.5f; j<1; j++)
-                for(float k=-.5f; k<1; k++)
+                // For drawing the extents of each collidable brush
+                /*
+                for(float i =- .5f; i <= .5; i += .25f)
+                for(float j =- .5f; j <= .5; j += .25f)
+                for(float k =- .5f; k <= .5; k += .25f)
                 {
                     Vector3 point = new(i, j, k);
                     point = Multiply(trans, point);
                     DrawMarker(point);
                 }
+                */
 
                 for (float i = 0; i <= 1; i += .01f)
                 {
                     var sample = localPos + i * localVel;
-                    bool xInBounds = sample.X > cLowBound && sample.X < cHighBound;
+                    bool xInBounds = sample.X > cLowBound - (cPadding / brush.GetScale.X) && sample.X < cHighBound + (cPadding / brush.GetScale.X);
                     bool yInBounds = sample.Y - (playerHeight/brush.GetScale.Y) > cLowBound && sample.Y - (playerHeight/brush.GetScale.Y) < cHighBound;
-                    bool zInBounds = sample.Z > cLowBound && sample.Z < cHighBound;
+                    bool zInBounds = sample.Z > cLowBound - (cPadding / brush.GetScale.Z) && sample.Z < cHighBound + (cPadding / brush.GetScale.Z);
                     if (xInBounds && yInBounds && zInBounds) 
                     {
                         sample = Multiply(trans, sample);
-                        //DrawMarker(sample);
+                        sample.Y -= 2;
+                        DrawMarker(sample);
                         CollisionFound = true;
                     }
                 }

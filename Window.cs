@@ -80,6 +80,8 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
 
     private Texture _specularMap;
 
+    TextureManager texMan;
+
     private Camera _camera;
 
     private Movement movement;
@@ -131,6 +133,8 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
 
         _diffuseMap = Texture.LoadFromFile("Resources/outer tile.png");
         _specularMap = Texture.LoadFromFile("Resources/outer tile spec.png");
+
+        texMan = new();
 
         _camera = new Camera(Vector3.UnitZ * 3, Size.X / (float)Size.Y);
 
