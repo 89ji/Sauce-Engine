@@ -94,7 +94,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
     {
         base.OnLoad();
 
-        GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
         GL.Enable(EnableCap.DepthTest);
 
@@ -134,7 +134,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
         _diffuseMap = Texture.LoadFromFile("Resources/outer tile.png");
         _specularMap = Texture.LoadFromFile("Resources/outer tile spec.png");
 
-        texMan = new();
+        texMan = new(_lightingShader);
 
         _camera = new Camera(Vector3.UnitZ * 3, Size.X / (float)Size.Y);
 

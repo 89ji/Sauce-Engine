@@ -1,11 +1,14 @@
+using OpenTK.Graphics.OpenGL4;
 using Sauce_Engine;
 
 class TextureManager
 {
+    Shader lShader;
     Dictionary<Textures, (Texture, Texture)> TexMap;
-    public TextureManager()
+    public TextureManager(Shader lShader)
     {
         TexMap = new();
+        this.lShader = lShader;
 
         Texture concFloor = Texture.LoadFromFile(@"Resources/concrete_tile.jpg");
         Texture concFloorSpec = Texture.LoadFromFile(@"Resources/concrete_tile spec.jpg");
@@ -50,6 +53,15 @@ class TextureManager
         Texture crate = Texture.LoadFromFile(@"Resources/crate.png");
         Texture crateSpec = Texture.LoadFromFile(@"Resources/crate spec.png");
         TexMap.Add(Textures.Crate, (brick, brickSpec));
+
+    }
+
+    public void SwapToTexture(Textures target)
+    {
+        if (!TexMap.ContainsKey(target)) throw new NotImplementedException("Texture has not been addded to map yet!");
+        var textures = TexMap[target];
+        textures.Item1.Use(TextureUnit.Texture0);
+        textures.Item2.Use(TextureUnit.Texture1);
     }
 }
 

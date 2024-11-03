@@ -14,7 +14,7 @@ class Movement
     public MapObjList imObjList;
     const float gravity = -9.8f;
     const float cameraSpeed = 10f * 10f;
-    const float airControlPenalty = .9f;
+    const float airControlPenalty = .3f;
 
 
 
@@ -76,8 +76,8 @@ class Movement
         }
         else
         {
-            //Velocity.X *= .99f;
-            //Velocity.Z *= .99f;
+            Velocity.X *= .999f;
+            Velocity.Z *= .999f;
         }
 
         //Console.WriteLine($"X:{Velocity.X:F2} Y:{Velocity.Y:F2} Z:{Velocity.Z:F2}");
