@@ -75,11 +75,6 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
     private Shader _lampShader;
 
     private Shader _lightingShader;
-
-    private Texture _diffuseMap;
-
-    private Texture _specularMap;
-
     TextureManager texMan;
 
     private Camera _camera;
@@ -131,9 +126,6 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
             GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
         }
 
-        _diffuseMap = Texture.LoadFromFile("Resources/outer tile.png");
-        _specularMap = Texture.LoadFromFile("Resources/outer tile spec.png");
-
         texMan = new(_lightingShader);
 
         _camera = new Camera(Vector3.UnitZ * 3, Size.X / (float)Size.Y);
@@ -152,8 +144,8 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
 
         GL.BindVertexArray(_vaoModel);
 
-        _diffuseMap.Use(TextureUnit.Texture0);
-        _specularMap.Use(TextureUnit.Texture1);
+        texMan.SwapToTexture(Textures.Crate);
+
         _lightingShader.Use();
 
         _lightingShader.SetMatrix4("view", _camera.GetViewMatrix());
@@ -218,6 +210,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
         {
             if (mapobj is Brush b)
             {
+                texMan.SwapToTexture(b.texture);
                 Matrix4 model = b.MakeGlModelMat();
                 _lightingShader.SetMatrix4("model", model);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, 36);

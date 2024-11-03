@@ -27,7 +27,7 @@ class Movement
 
     public void Process(KeyboardState input, FrameEventArgs e)
     {
-        Console.Clear();
+        //Console.Clear();
         Vector3 Acceleration = new(0, gravity, 0);
 
         float airControl;
@@ -43,7 +43,7 @@ class Movement
         {
             airControl = airControlPenalty;
         }
-        Console.WriteLine($"Grounded: {Grounded}");
+        //Console.WriteLine($"Grounded: {Grounded}");
         
         // Eliminate flying from the cameras range of movement
         var flatFront = cam.Front;
@@ -122,15 +122,15 @@ class Movement
                     bool zInBounds = sample.Z > cLowBound - (cPadding / brush.GetScale.Z) && sample.Z < cHighBound + (cPadding / brush.GetScale.Z);
                     if (xInBounds && yInBounds && zInBounds) 
                     {
-                        sample = Multiply(trans, sample);
-                        sample.Y -= 2;
-                        DrawMarker(sample);
-                        CollisionFound = true;
+                        //sample = Multiply(trans, sample);
+                        //sample.Y -= 2;
+                        //DrawMarker(sample);
+                        return true;
                     }
                 }
             }
         }
-        return CollisionFound;
+        return false;
     }
 
     Vector3 Multiply(Matrix4 m, Vector3 rhs)

@@ -52,7 +52,7 @@ class TextureManager
 
         Texture crate = Texture.LoadFromFile(@"Resources/crate.png");
         Texture crateSpec = Texture.LoadFromFile(@"Resources/crate spec.png");
-        TexMap.Add(Textures.Crate, (brick, brickSpec));
+        TexMap.Add(Textures.Crate, (crate, crateSpec));
 
     }
 
