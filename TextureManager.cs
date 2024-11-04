@@ -23,7 +23,7 @@ class TextureManager
 
         // TODO dark and light concrete
         Texture concDark = Texture.LoadFromFile(@"Resources/conc dark.jpg");
-        Texture concLight = Texture.LoadFromFile(@"Resource/conc light.jpg");
+        Texture concLight = Texture.LoadFromFile(@"Resources/conc light.jpg");
         Texture concSpec = Texture.LoadFromFile(@"Resources/metal spec.png");
         TexMap.Add(Textures.ConcDark, (concDark, concSpec));
         TexMap.Add(Textures.ConcLight, (concLight, concSpec));
@@ -38,7 +38,7 @@ class TextureManager
         TexMap.Add(Textures.Brick, (brick, brickSpec));
 
         Texture inConc = Texture.LoadFromFile(@"Resources/inConcFloor.jpg");
-        Texture inConcSpec = Texture.LoadFromFile(@"Resources/inConcSpec.jpg");
+        Texture inConcSpec = Texture.LoadFromFile(@"Resources/inConcFloorSpec.jpg");
         TexMap.Add(Textures.IndoorConcFloor, (inConc, inConcSpec));
         
         Texture carpet = Texture.LoadFromFile(@"Resources/carpet.jpg");
@@ -49,12 +49,12 @@ class TextureManager
         Texture ceilingSpec = Texture.LoadFromFile(@"Resources/ceiling spec.jpg");
         TexMap.Add(Textures.Ceiling, (ceiling, ceilingSpec));
 
-        Texture brickWall = Texture.LoadFromFile(@"Resourses/brick wall.jpg");
-        Texture brickWallSpec = Texture.LoadFromFile(@"Resourses/brick wall spec.jpg");
+        Texture brickWall = Texture.LoadFromFile(@"Resources/brick wall.jpg");
+        Texture brickWallSpec = Texture.LoadFromFile(@"Resources/brick wall spec.jpg");
         TexMap.Add(Textures.BrickWall, (brickWall, brickWallSpec));
 
-        Texture dirt = Texture.LoadFromFile(@"Resourses/dirt.jpg");
-        Texture dirtSpec = Texture.LoadFromFile(@"Resourses/dirt spec.jpg");
+        Texture dirt = Texture.LoadFromFile(@"Resources/dirt.jpg");
+        Texture dirtSpec = Texture.LoadFromFile(@"Resources/dirt spec.jpg");
         TexMap.Add(Textures.Dirt, (dirt, dirtSpec));
 
         Texture crate = Texture.LoadFromFile(@"Resources/crate.png");
