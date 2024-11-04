@@ -22,6 +22,12 @@ class TextureManager
         TexMap.Add(Textures.Glass, (glass, glass));
 
         // TODO dark and light concrete
+        Texture concDark = Texture.LoadFromFile(@"Resources/conc dark.jpg");
+        Texture concLight = Texture.LoadFromFile(@"Resource/conc light.jpg");
+        Texture concSpec = Texture.LoadFromFile(@"Resources/metal spec.png");
+        TexMap.Add(Textures.ConcDark, (concDark, concSpec));
+        TexMap.Add(Textures.ConcLight, (concLight, concSpec));
+
 
         Texture metal = Texture.LoadFromFile(@"Resources/metal.png");
         Texture metalSpec = Texture.LoadFromFile(@"Resources/metal spec.png");
@@ -31,12 +37,9 @@ class TextureManager
         Texture brickSpec = Texture.LoadFromFile(@"Resources/outer tile spec.png");
         TexMap.Add(Textures.Brick, (brick, brickSpec));
 
-        /*
-        TODO indoors concrete floor
-        Texture inConc = Texture.LoadFromFile(@"Resources/outer tile.png");
-        Texture inConcSpec = Texture.LoadFromFile(@"Resources/outer tile spec.png");
+        Texture inConc = Texture.LoadFromFile(@"Resources/inConcFloor.jpg");
+        Texture inConcSpec = Texture.LoadFromFile(@"Resources/inConcSpec.jpg");
         TexMap.Add(Textures.IndoorConcFloor, (inConc, inConcSpec));
-        */
         
         Texture carpet = Texture.LoadFromFile(@"Resources/carpet.jpg");
         Texture carpetSpec = Texture.LoadFromFile(@"Resources/carpet spec.jpg");
@@ -46,9 +49,13 @@ class TextureManager
         Texture ceilingSpec = Texture.LoadFromFile(@"Resources/ceiling spec.jpg");
         TexMap.Add(Textures.Ceiling, (ceiling, ceilingSpec));
 
-        // TODO brick wall
+        Texture brickWall = Texture.LoadFromFile(@"Resourses/brick wall.jpg");
+        Texture brickWallSpec = Texture.LoadFromFile(@"Resourses/brick wall spec.jpg");
+        TexMap.Add(Textures.BrickWall, (brickWall, brickWallSpec));
 
-        // TODO dirt
+        Texture dirt = Texture.LoadFromFile(@"Resourses/dirt.jpg");
+        Texture dirtSpec = Texture.LoadFromFile(@"Resourses/dirt spec.jpg");
+        TexMap.Add(Textures.Dirt, (dirt, dirtSpec));
 
         Texture crate = Texture.LoadFromFile(@"Resources/crate.png");
         Texture crateSpec = Texture.LoadFromFile(@"Resources/crate spec.png");
