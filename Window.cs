@@ -166,7 +166,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
         */
         // Directional light
         _lightingShader.SetVector3("dirLight.direction", new Vector3(-0.2f, -1.0f, -0.3f));
-        _lightingShader.SetVector3("dirLight.ambient", new Vector3(0.05f, 0.05f, 0.05f));
+        _lightingShader.SetVector3("dirLight.ambient", new Vector3(0.2f, 0.2f, 0.2f));
         _lightingShader.SetVector3("dirLight.diffuse", new Vector3(0.4f, 0.4f, 0.4f));
         _lightingShader.SetVector3("dirLight.specular", new Vector3(0.1f, 0.1f, 0.1f));
 

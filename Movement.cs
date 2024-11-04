@@ -27,13 +27,12 @@ class Movement
 
     public void Process(KeyboardState input, FrameEventArgs e)
     {
-        //Console.Clear();
         Vector3 Acceleration = new(0, gravity, 0);
 
         float airControl;
         bool Grounded = ComputeCollision(cam.Position, new Vector3(0, -1, 0));
 
-        if(Grounded) 
+        if (Grounded)
         {
             Velocity.Y = 0;
             Acceleration.Y = 0;
@@ -43,8 +42,7 @@ class Movement
         {
             airControl = airControlPenalty;
         }
-        //Console.WriteLine($"Grounded: {Grounded}");
-        
+
         // Eliminate flying from the cameras range of movement
         var flatFront = cam.Front;
         var flatRight = cam.Right;
@@ -52,6 +50,14 @@ class Movement
         flatFront.Normalize();
         flatRight.Y = 0;
         flatRight.Normalize();
+
+        // Checking collisions for movement and stuff
+        //bool FrontBlocked = ComputeCollision(cam.Position, flatFront.Normalized() * .5f);
+        //bool BackBlocked = ComputeCollision(cam.Position, flatFront.Normalized() * -.5f);
+        //bool RightBlocked = ComputeCollision(cam.Position, flatRight.Normalized() * .5f);
+        //bool LeftBlocked = ComputeCollision(cam.Position, flatRight.Normalized() * -.5f);
+        bool TopBlocked = ComputeCollision(cam.Position + new Vector3(0f, 3f, 0f), new(0, 1f, 0), true);
+        if (TopBlocked) throw new Exception("Top blocked!");
 
         // Check inputs and move and stuff
         if (input.IsKeyDown(Keys.W)) Acceleration += flatFront * cameraSpeed * airControl;
@@ -67,9 +73,14 @@ class Movement
 
 
         Velocity += Acceleration * (float)e.Time;
+
+        if (TopBlocked && Velocity.Y > 0) Velocity.Y = -1;
+        Console.WriteLine(TopBlocked);
+
         cam.Position += Velocity * (float)e.Time;
 
-        if(Grounded)
+
+        if (Grounded)
         {
             Velocity.X *= .98f;
             Velocity.Z *= .98f;
@@ -79,23 +90,21 @@ class Movement
             Velocity.X *= .999f;
             Velocity.Z *= .999f;
         }
-
-        //Console.WriteLine($"X:{Velocity.X:F2} Y:{Velocity.Y:F2} Z:{Velocity.Z:F2}");
     }
 
     const float cLowBound = -.5f;
     const float cHighBound = .5f;
     const float cPadding = .5f;
     const float playerHeight = 2;
-    bool ComputeCollision(Vector3 position, Vector3 direction)
+    bool ComputeCollision(Vector3 position, Vector3 direction, bool Debug = false)
     {
         bool CollisionFound = false;
         foreach (var obj in objs)
         {
-            if(obj is Brush brush)
+            if (obj is Brush brush)
             {
                 Transform transf = new Transform(brush.transform);
-                transf.RotateTo(new (-transf.Rotation.X, -transf.Rotation.Y, -transf.Rotation.Z));
+                transf.RotateTo(new(-transf.Rotation.X, -transf.Rotation.Y, -transf.Rotation.Z));
                 Matrix4 trans = transf.GetMat().ToGLMat4();
                 Matrix4 arcTrans = trans.Inverted();
 
@@ -118,19 +127,30 @@ class Movement
                 {
                     var sample = localPos + i * localVel;
                     bool xInBounds = sample.X > cLowBound - (cPadding / brush.GetScale.X) && sample.X < cHighBound + (cPadding / brush.GetScale.X);
-                    bool yInBounds = sample.Y - (playerHeight/brush.GetScale.Y) > cLowBound && sample.Y - (playerHeight/brush.GetScale.Y) < cHighBound;
+                    bool yInBounds = sample.Y - (playerHeight / brush.GetScale.Y) > cLowBound && sample.Y - (playerHeight / brush.GetScale.Y) < cHighBound;
                     bool zInBounds = sample.Z > cLowBound - (cPadding / brush.GetScale.Z) && sample.Z < cHighBound + (cPadding / brush.GetScale.Z);
-                    if (xInBounds && yInBounds && zInBounds) 
+
+                    if (Debug)
                     {
-                        //sample = Multiply(trans, sample);
+                        sample = Multiply(trans, sample);
                         //sample.Y -= 2;
-                        //DrawMarker(sample);
-                        return true;
+                        DrawMarker(sample);
+                    }
+                    if (xInBounds && yInBounds && zInBounds)
+                    {
+                        if (Debug)
+                        {
+                            sample = Multiply(trans, sample);
+                            //sample.Y -= 2;
+                            DrawMarker(sample);
+                        }
+                        CollisionFound = true;
                     }
                 }
             }
         }
-        return false;
+        if (Debug) DrawMarker(position + direction);
+        return CollisionFound;
     }
 
     Vector3 Multiply(Matrix4 m, Vector3 rhs)
@@ -140,7 +160,7 @@ class Movement
         res.Y = m.M21 * rhs.X + m.M22 * rhs.Y + m.M23 * rhs.Z + m.M24;
         res.Z = m.M31 * rhs.X + m.M32 * rhs.Y + m.M33 * rhs.Z + m.M34;
         res.W = m.M41 * rhs.X + m.M42 * rhs.Y + m.M43 * rhs.Z + m.M44;
-        return new (res.X/res.W, res.Y/res.W, res.Z/res.W);
+        return new(res.X / res.W, res.Y / res.W, res.Z / res.W);
     }
 
     void DrawMarker(Vector3 Location, float Size = .2f)

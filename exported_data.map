@@ -1,8 +1,9 @@
 Mapname: wow so cool
 Brush: <10, -5, 0> <0, 45, 0> <10, 1, 10> Crate
-Brush: <10, -6, 0> <0, 0, 0> <10, 4, 10> Crate
+Brush: <10, -6, 0> <0, 0, 0> <10, 4, 10> Carpet
 Brush: <0, -6, 0> <0, 0, 0> <1, 1, 1> Metal
 Brush: <0, -7, 0> <0, 0, 0> <50, .1, 50> Glass
+Brush: <0, 3, 0> <0, 0, 0> <50, .1, 25> Ceiling
 Entity: <15, 0, 15> <0, 0, 0> Omni
 Entity: <-15, 5, 15> <0, 0, 0> Omni
 Entity: <15, 5, -15> <0, 0, 0> Omni
