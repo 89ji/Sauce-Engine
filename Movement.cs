@@ -4,16 +4,17 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using Sauce_Engine;
 using Sauce_Engine.Types;
 using Sauce_Engine.Util;
+using Sauce_Engine.Numerics;
 
 using Matrix4x4 = System.Numerics.Matrix4x4;
-using Vec3 = System.Numerics.Vector3;
-using Vec3d = Sauce_Engine.Types.Vector3d;
+using SysVec3 = System.Numerics.Vector3;
+
 
 class Movement
 {
     Camera cam;
     MapObjList objs;
-    public MapObjList imObjList;
+    MapObjList imObjList;
     const float gravity = -9.8f;
     const float cameraSpeed = 10f * 10f;
     const float airControlPenalty = .3f;
@@ -21,10 +22,11 @@ class Movement
 
 
     Vector3 Velocity = new();
-    public Movement(Camera cam, MapObjList objects)
+    public Movement(Camera cam, MapObjList objects, MapObjList immObjs)
     {
         this.cam = cam;
         objs = objects;
+        imObjList = immObjs;
     }
 
     public void Process(KeyboardState input, FrameEventArgs e)
@@ -32,7 +34,7 @@ class Movement
         Vector3 Acceleration = new(0, gravity, 0);
 
         float airControl;
-        bool Grounded = ComputeCollision(cam.Position.ToSauceCoord3d(), new (0, -1, 0));
+        bool Grounded = ComputeCollision(cam.Position.ToSauceCoord3d(), new Direction3d(0, -1, 0));
 
         if (Grounded)
         {
@@ -58,7 +60,7 @@ class Movement
         //bool BackBlocked = ComputeCollision(cam.Position, flatFront.Normalized() * -.5f);
         //bool RightBlocked = ComputeCollision(cam.Position, flatRight.Normalized() * .5f);
         //bool LeftBlocked = ComputeCollision(cam.Position, flatRight.Normalized() * -.5f);
-        bool TopBlocked = ComputeCollision(cam.Position.ToSauceCoord3d() + new Vec3d(0f, 3f, 0f), new(0, 1f, 0), true);
+        bool TopBlocked = ComputeCollision(cam.Position.ToSauceCoord3d() + new Direction3d(0f, 3f, 0f), new Direction3d(0, 1f, 0), true);
         if (TopBlocked) throw new Exception("Top blocked!");
 
         // Check inputs and move and stuff
@@ -98,7 +100,7 @@ class Movement
     const float cHighBound = .5f;
     const float cPadding = .5f;
     const float playerHeight = 2;
-    bool ComputeCollision(Coord3d position, Vec3d direction, bool Debug = false)
+    bool ComputeCollision(Position3d position, Direction3d direction, bool Debug = false)
     {
         bool CollisionFound = false;
         foreach (var obj in objs)
@@ -110,8 +112,8 @@ class Movement
                 Matrix4 trans = transf.GetMat().ToGLMat4();
                 Matrix4 arcTrans = trans.Inverted();
 
-                Coord3d localPos = arcTrans.TransformPoint(position);
-                Vec3d localDir = arcTrans.TransformPoint(direction);
+                Position3d localPos = arcTrans.TransformPoint(position);
+                Direction3d localDir = arcTrans.TransformPoint(direction);
 
                 // For drawing the extents of each collidable brush
                 /*
@@ -127,7 +129,7 @@ class Movement
 
                 for (float i = 0; i <= 1; i += .01f)
                 {
-                    Coord3d sample = localPos + (i * localDir);
+                    Position3d sample = localPos + (i * localDir);
                     bool xInBounds = sample.X > cLowBound - (cPadding / brush.GetScale.X) && sample.X < cHighBound + (cPadding / brush.GetScale.X);
                     bool yInBounds = sample.Y - (playerHeight / brush.GetScale.Y) > cLowBound && sample.Y - (playerHeight / brush.GetScale.Y) < cHighBound;
                     bool zInBounds = sample.Z > cLowBound - (cPadding / brush.GetScale.Z) && sample.Z < cHighBound + (cPadding / brush.GetScale.Z);
@@ -157,11 +159,11 @@ class Movement
 
     void DrawMarker(Vector3 Location, float Size = .2f)
     {
-        imObjList.AddMapObject(new Brush(new Transform(Vec3.Zero, Location.ToSysVec3(), new Vec3(Size, Size, Size))));
+        imObjList.AddMapObject(new Brush(new Transform(SysVec3.Zero, Location.ToSysVec3(), new SysVec3(Size, Size, Size))));
     }
 
-    void DrawMarker(Coord3d Location, float Size = .2f)
+    void DrawMarker(Position3d Location, float Size = .2f)
     {
-        imObjList.AddMapObject(new Brush(new Transform(Vec3.Zero, Location.ToSysVec3(), new Vec3(Size, Size, Size))));
+        imObjList.AddMapObject(new Brush(new Transform(SysVec3.Zero, Location.ToSysVec3(), new SysVec3(Size, Size, Size))));
     }
 }

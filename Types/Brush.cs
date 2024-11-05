@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
+using Sauce_Engine.Numerics;
 
 namespace Sauce_Engine.Types;
 

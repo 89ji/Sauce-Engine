@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Sauce_Engine.Util;
+using Sauce_Engine.Numerics;
+
 using Matrix4 = OpenTK.Mathematics.Matrix4;
 
 namespace Sauce_Engine.Types;

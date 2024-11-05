@@ -2,24 +2,25 @@ using System;
 using System.Numerics;
 using Sauce_Engine.Enums;
 using Sauce_Engine.Util;
-using Vector3 = System.Numerics.Vector3;
 
-namespace Sauce_Engine.Types;
+using SysVec3 = System.Numerics.Vector3;
+
+namespace Sauce_Engine.Numerics;
 
 public class Transform
 {
-    public Vector3 Rotation {private set; get;}
-    public Vector3 Translation {private set; get;}
-    public Vector3 Scale {private set; get;}
+    public SysVec3 Rotation {private set; get;}
+    public SysVec3 Translation {private set; get;}
+    public SysVec3 Scale {private set; get;}
 
     bool isMatCurrent = false;
     public Matrix4x4 Matrix {private set; get;}
 
-    public Transform(Vector3? rotation, Vector3? translation, Vector3? scale)
+    public Transform(SysVec3? rotation, SysVec3? translation, SysVec3? scale)
     {
-        if(!rotation.HasValue) rotation = Vector3.Zero;
-        if(!translation.HasValue) translation = Vector3.Zero;
-        if(!scale.HasValue) scale = Vector3.One;
+        if(!rotation.HasValue) rotation = SysVec3.Zero;
+        if(!translation.HasValue) translation = SysVec3.Zero;
+        if(!scale.HasValue) scale = SysVec3.One;
 
         Rotation = rotation.Value;
         Translation = translation.Value;
@@ -28,9 +29,9 @@ public class Transform
 
     public Transform()
     {
-        Rotation = Vector3.Zero;
-        Translation = Vector3.Zero;
-        Scale = Vector3.One;
+        Rotation = SysVec3.Zero;
+        Translation = SysVec3.Zero;
+        Scale = SysVec3.One;
     }
 
     public Transform(Transform original)
@@ -39,38 +40,38 @@ public class Transform
         var oT = original.Translation;
         var oS = original.Scale;
 
-        Rotation = new Vector3(oR.X, oR.Y, oR.Z);
-        Translation = new Vector3(oT.X, oT.Y, oT.Z);
+        Rotation = new SysVec3(oR.X, oR.Y, oR.Z);
+        Translation = new SysVec3(oT.X, oT.Y, oT.Z);
         Scale = new(oS.X, oS.Y, oS.Z);
     }
 
-    public void TranslateBy(Vector3 translation)
+    public void TranslateBy(SysVec3 translation)
     {
         isMatCurrent = false;
         Translation += translation;
     }
-    public void RotateBy(Vector3 rotation)
+    public void RotateBy(SysVec3 rotation)
     {
         isMatCurrent = false;
         Rotation += rotation;
     }
-    public void ScaleBy(Vector3 scale)
+    public void ScaleBy(SysVec3 scale)
     { 
         isMatCurrent = false;
         Scale += scale;
     }
     
-    public void TranslateTo(Vector3 translation)
+    public void TranslateTo(SysVec3 translation)
     {
         isMatCurrent = false;
         Translation = translation;
     }
-    public void RotateTo(Vector3 rotation)
+    public void RotateTo(SysVec3 rotation)
     {
         isMatCurrent = false;
         Rotation = rotation;
     }
-    public void ScaleTo(Vector3 scale)
+    public void ScaleTo(SysVec3 scale)
     { 
         isMatCurrent = false;
         Scale = scale;
