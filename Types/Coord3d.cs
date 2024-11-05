@@ -36,6 +36,10 @@ public class Coord3d
         return new Coord3d(res.X/res.W, res.Y/res.W, res.Z/res.W);
     }
     public static Vector3d operator-(Coord3d lhs, Coord3d rhs) => new (lhs.X-rhs.X, lhs.Y-rhs.Y, lhs.Z-rhs.Z);
+
+    public static Coord3d operator-(Coord3d lhs, Vector3d rhs) => new (lhs.X-rhs.X, lhs.Y-rhs.Y, lhs.Z-rhs.Z);
+    public static Coord3d operator+(Coord3d lhs, Vector3d rhs) => new (lhs.X+rhs.X, lhs.Y+rhs.Y, lhs.Z+rhs.Z);
+
     public static float Dot(Coord3d lhs, Coord3d rhs) => lhs.X * rhs.X + lhs.Y * rhs.Y + lhs.Z * rhs.Z;
     
     public static Vector3d Cross(Coord3d a, Coord3d b)
@@ -51,4 +55,6 @@ public class Coord3d
     {
         return new(Y * b.Z - Z * b.Y, Z * b.X - X * b.Z, X * b.Y - Y * b.X);
     }
+
+    public Vector3 ToSysVec3() => new (X, Y, Z);
 }
