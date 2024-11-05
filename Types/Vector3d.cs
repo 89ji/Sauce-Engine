@@ -36,6 +36,10 @@ public class Vector3d
 		res.W = m.M41 * rhs.X + m.M42 * rhs.Y + m.M43 * rhs.Z + m.M44;
 		return new Vector3d(res.X/res.W, res.Y/res.W, res.Z/res.W);
 	}
+
+	public static Vector3d operator*(float lhs, Vector3d rhs) => new (lhs * rhs.X, lhs * rhs.Y, lhs * rhs.Z);
+	public static Vector3d operator*(Vector3d rhs, float lhs) => new (lhs * rhs.X, lhs * rhs.Y, lhs * rhs.Z);
+
     
 	public static Vector3d operator-(Vector3d lhs, Vector3d rhs) => new (lhs.X-rhs.X, lhs.Y-rhs.Y, lhs.Z-rhs.Z);
 	public static Vector3d operator+(Vector3d lhs, Vector3d rhs) => new (lhs.X+rhs.X, lhs.Y+rhs.Y, lhs.Z+rhs.Z);
@@ -57,4 +61,6 @@ public class Vector3d
 	{
 		return new(Y * b.Z - Z * b.Y, Z * b.X - X * b.Z, X * b.Y - Y * b.X);
 	}
+
+	public Vector3 ToSysVec3() => new (X, Y, Z);
 }

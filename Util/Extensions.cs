@@ -1,7 +1,10 @@
 using System;
 using System.IO;
-using System.Numerics;
 using OpenTK.Mathematics;
+using Sauce_Engine.Types;
+using Matrix4x4 = System.Numerics.Matrix4x4;
+using Vec3 = System.Numerics.Vector3;
+using Vec3d = Sauce_Engine.Types.Vector3d;
 
 namespace Sauce_Engine.Util;
 
@@ -47,4 +50,25 @@ public static class Extensions
 		return val;
 	}
 
+	public static Coord3d ToSauceCoord3d(this OpenTK.Mathematics.Vector3 vec) => new(vec.X, vec.Y, vec.Z);
+	public static Sauce_Engine.Types.Vector3d ToSauceVec3d(this OpenTK.Mathematics.Vector3 vec) => new(vec.X, vec.Y, vec.Z);
+	public static Vec3d TransformPoint(this Matrix4 m, Vec3d rhs)
+    {
+        Vector4 res = new();
+        res.X = m.M11 * rhs.X + m.M12 * rhs.Y + m.M13 * rhs.Z + m.M14;
+        res.Y = m.M21 * rhs.X + m.M22 * rhs.Y + m.M23 * rhs.Z + m.M24;
+        res.Z = m.M31 * rhs.X + m.M32 * rhs.Y + m.M33 * rhs.Z + m.M34;
+        res.W = m.M41 * rhs.X + m.M42 * rhs.Y + m.M43 * rhs.Z + m.M44;
+        return new(res.X / res.W, res.Y / res.W, res.Z / res.W);
+    }
+
+    public static Coord3d TransformPoint(this Matrix4 m, Coord3d rhs)
+    {
+        Vector4 res = new();
+        res.X = m.M11 * rhs.X + m.M12 * rhs.Y + m.M13 * rhs.Z + m.M14;
+        res.Y = m.M21 * rhs.X + m.M22 * rhs.Y + m.M23 * rhs.Z + m.M24;
+        res.Z = m.M31 * rhs.X + m.M32 * rhs.Y + m.M33 * rhs.Z + m.M34;
+        res.W = m.M41 * rhs.X + m.M42 * rhs.Y + m.M43 * rhs.Z + m.M44;
+        return new(res.X / res.W, res.Y / res.W, res.Z / res.W);
+    }
 }
