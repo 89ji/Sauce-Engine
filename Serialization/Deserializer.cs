@@ -5,6 +5,7 @@ using System.IO;
 using Sauce_Engine.Enums;
 using Sauce_Engine.Types;
 using Sauce_Engine.Util;
+using Sauce_Engine.Numerics;
 
 namespace Sauce_Engine.Serialization;
 
@@ -12,25 +13,24 @@ public static class Deserializer
 {
 	// Loads a .map from a path and places the brushes into the brushlist singleton
 	// NOTICE: Currently clears the brushlist before appending
-	public static void DeserializeMap(string src)
+	public static void DeserializeMap(string src, out string Mapname)
 	{
 		if (!File.Exists(src)) throw new FileNotFoundException();
 		if (Path.GetExtension(src) != ".map") throw new Exception("Wrong file format");
 
 		MapObjList brushes = MapObjList.Instance;
 		brushes.Clear();
-
-		string mapname;
+		Mapname = "Name not found";
 
 		using StreamReader sr = new StreamReader(src);
 		while (!sr.EndOfStream)
 		{
-			string line = sr.ReadLine();
-			var tokens = line.Split(':');
+			string? line = sr.ReadLine() ?? throw new Exception("Failed to read line");
+            var tokens = line.Split(':');
 			switch (tokens[0])
 			{
 				case "Mapname":
-					mapname = ReadMapname(tokens[1]);
+					Mapname = ReadMapname(tokens[1]);
 					break;
 				case "Brush":
 					brushes.AddMapObject(ReadBrush(tokens[1]));

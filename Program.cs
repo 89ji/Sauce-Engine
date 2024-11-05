@@ -14,7 +14,7 @@ public static class Program
 	private static void Main()
 	{
 		MapObjList mapObjects = MapObjList.Instance;
-		Deserializer.DeserializeMap(@"exported_data.map");
+		Deserializer.DeserializeMap(@"exported_data.map", out string Mapname);
 
 		using Stream stream = File.OpenRead("ficon.png");
 		var img = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
@@ -25,7 +25,7 @@ public static class Program
 		var nativeWindowSettings = new NativeWindowSettings()
 		{
 			ClientSize = new Vector2i(1900, 1040),
-			Title = "hl3.exe",
+			Title = $"hl3.exe - {Mapname}",
 			Icon = icon
 		};
 

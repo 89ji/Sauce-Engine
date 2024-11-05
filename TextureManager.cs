@@ -21,7 +21,6 @@ class TextureManager
         Texture glass = Texture.LoadFromFile(@"Resources/glass.jpg");
         TexMap.Add(Textures.Glass, (glass, glass));
 
-        // TODO dark and light concrete
         Texture concDark = Texture.LoadFromFile(@"Resources/conc dark.jpg");
         Texture concLight = Texture.LoadFromFile(@"Resources/conc light.jpg");
         Texture concSpec = Texture.LoadFromFile(@"Resources/metal spec.png");

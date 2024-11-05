@@ -132,8 +132,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
 
         CursorState = CursorState.Grabbed;
 
-        movement = new(_camera, mapObjects);
-        movement.imObjList = imObjects;
+        movement = new(_camera, mapObjects, imObjects);
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
