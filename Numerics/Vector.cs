@@ -17,4 +17,9 @@ public abstract class Vector
     }
 
     public SysVec3 ToSysVec3() => new(X, Y, Z);
+
+    static public float Distance<T>(T lhs, T rhs) where T : Vector
+    {
+        return MathF.Sqrt( MathF.Pow(lhs.X - rhs.X, 2) + MathF.Pow(lhs.Y - rhs.Y, 2) + MathF.Pow(lhs.Z - rhs.Z, 2) );
+    }
 }

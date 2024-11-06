@@ -15,6 +15,7 @@ class Movement
     Camera cam;
     MapObjList objs;
     MapObjList imObjList;
+    CollisionManager colMan;
     const float gravity = -9.8f;
     const float cameraSpeed = 10f * 10f;
     const float airControlPenalty = .3f;
@@ -28,6 +29,7 @@ class Movement
         this.cam = cam;
         objs = objects;
         imObjList = immObjs;
+        colMan = new(objs, immObjs);
     }
 
     public void Process(KeyboardState input, FrameEventArgs e)
@@ -80,7 +82,7 @@ class Movement
             moveDirection.Normalize();
 
             Matrix4 rotate90 = Matrix4.CreateFromAxisAngle(Vector3.UnitY, 90f.toDeg());
-            Vector3 rightMovement = Multiply(rotate90, moveDirection);
+            Vector3 rightMovement = rotate90.TransformPoint(moveDirection);
 
             float frontBlock = ComputeCollisionDistance(cam.Position + new Vector3(0, .25f, 0) + .25f * moveDirection, moveDirection * 2);
             float rightExtent = ComputeCollisionDistance(cam.Position + new Vector3(0, .25f, 0) + rightMovement * slideMeasureGap - moveDirection, moveDirection * 5, true);
@@ -216,7 +218,7 @@ class Movement
     }
 
     // Similar to the other function but returns +inf if no collision and the distance if found
-    float ComputeCollisionDistance(Vector3 position, Vector3 direction, bool Debug = false)
+    float ComputeCollisionDistance(Position3d position, Direction3d direction, bool Debug = false)
     {
         float CollisionFound = float.PositiveInfinity;
         foreach (var obj in objs)
@@ -228,8 +230,8 @@ class Movement
                 Matrix4 trans = transf.GetMat().ToGLMat4();
                 Matrix4 arcTrans = trans.Inverted();
 
-                var localPos = Multiply(arcTrans, position);
-                var localVel = Multiply(arcTrans, direction);
+                var localPos = arcTrans.TransformPoint(position);
+                var localVel = arcTrans.TransformPoint(direction);
 
                 for (float i = 0; i <= 1; i += .05f)
                 {
@@ -246,8 +248,8 @@ class Movement
                     }*/
                     if (xInBounds && yInBounds && zInBounds) 
                     {
-                        DrawMarker(Multiply(trans, sample));
-                        CollisionFound = MathF.Min(CollisionFound, Vector3.Distance(position, sample));
+                        DrawMarker(trans.TransformPoint(sample));
+                        CollisionFound = MathF.Min(CollisionFound, Vector.Distance(position, sample));
                     }
                 }
             }
@@ -256,15 +258,6 @@ class Movement
         return CollisionFound;
     }
 
-    Vector3 Multiply(Matrix4 m, Vector3 rhs)
-    {
-        Vector4 res = new();
-        res.X = m.M11 * rhs.X + m.M12 * rhs.Y + m.M13 * rhs.Z + m.M14;
-        res.Y = m.M21 * rhs.X + m.M22 * rhs.Y + m.M23 * rhs.Z + m.M24;
-        res.Z = m.M31 * rhs.X + m.M32 * rhs.Y + m.M33 * rhs.Z + m.M34;
-        res.W = m.M41 * rhs.X + m.M42 * rhs.Y + m.M43 * rhs.Z + m.M44;
-        return new(res.X / res.W, res.Y / res.W, res.Z / res.W);
-    }
 
     void DrawMarker(Vector3 Location, float Size = .2f)
     {
