@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using OpenTK.Mathematics;
 using Sauce_Engine.Enums;
 using Sauce_Engine.Types;
 using Sauce_Engine.Util;
@@ -56,9 +57,9 @@ public static class Deserializer
 		line = line.Trim().Replace("<", "").Replace(">", "").Replace(",", "");
 		string[] numbers = line.Split(' ');
 
-		System.Numerics.Vector3? translation = new(numbers[0].ToFloat(), numbers[1].ToFloat(), numbers[2].ToFloat());
-		System.Numerics.Vector3 rotation = new(numbers[3].ToFloat(), numbers[4].ToFloat(), numbers[5].ToFloat());
-		System.Numerics.Vector3 scale = new(numbers[6].ToFloat(), numbers[7].ToFloat(), numbers[8].ToFloat());
+		Vector3 translation = new(numbers[0].ToFloat(), numbers[1].ToFloat(), numbers[2].ToFloat());
+		Vector3 rotation = new(numbers[3].ToFloat(), numbers[4].ToFloat(), numbers[5].ToFloat());
+		Vector3 scale = new(numbers[6].ToFloat(), numbers[7].ToFloat(), numbers[8].ToFloat());
 		Textures texture = numbers[9] switch
 		{
 			"ConcFloor" => Textures.ConcFloor,
@@ -85,8 +86,8 @@ public static class Deserializer
 		line = line.Trim().Replace("<", "").Replace(">", "").Replace(",", "");
 		var numbers = line.Split(' ');
 
-		System.Numerics.Vector3? translation = new(numbers[0].ToFloat(), numbers[1].ToFloat(), numbers[2].ToFloat());
-		System.Numerics.Vector3 rotation = new(numbers[3].ToFloat(), numbers[4].ToFloat(), numbers[5].ToFloat());
+		Vector3 translation = new(numbers[0].ToFloat(), numbers[1].ToFloat(), numbers[2].ToFloat());
+		Vector3 rotation = new(numbers[3].ToFloat(), numbers[4].ToFloat(), numbers[5].ToFloat());
 		Enums.EntityType type = numbers[6] switch
 		{
 			"Omni" => EntityType.OmniLight,
@@ -95,7 +96,7 @@ public static class Deserializer
 		};
 
 		var ret = new Entity(type);
-		ret.TranslateTo(translation.Value);
+		ret.TranslateTo(translation);
 		ret.RotateTo(rotation);
 		return ret;
 	}

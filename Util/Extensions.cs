@@ -1,13 +1,12 @@
 using System;
 using System.IO;
+using OpenTK.Mathematics;
 using Sauce_Engine.Types;
 using Sauce_Engine.Numerics;
 
 using Matrix4x4 = System.Numerics.Matrix4x4;
 using SysVec3 = System.Numerics.Vector3;
 using Vector4 = System.Numerics.Vector4;
-using GlVec3 = OpenTK.Mathematics.Vector3;
-using Matrix4 = OpenTK.Mathematics.Matrix4;
 
 namespace Sauce_Engine.Util;
 
@@ -44,8 +43,8 @@ public static class Extensions
 		return ret;
 	}
 
-	public static GlVec3 ToGlVec3(this SysVec3 vec) => new(vec.X, vec.Y, vec.Z);
-	public static SysVec3 ToSysVec3(this GlVec3 vec) => new(vec.X, vec.Y, vec.Z);
+	public static Vector3 ToGlVec3(this SysVec3 vec) => new(vec.X, vec.Y, vec.Z);
+	public static SysVec3 ToSysVec3(this Vector3 vec) => new(vec.X, vec.Y, vec.Z);
 	public static float Clamp(this float val, float floor, float ceil)
 	{
 		if (val < floor) return floor;
@@ -53,9 +52,13 @@ public static class Extensions
 		return val;
 	}
 
-	public static Position3d ToSauceCoord3d(this OpenTK.Mathematics.Vector3 vec) => new(vec.X, vec.Y, vec.Z);
-	public static Direction3d ToSauceDir3d(this GlVec3 vec) => new(vec.X, vec.Y, vec.Z);
-	public static Direction3d TransformPoint(this Matrix4 m, Direction3d rhs)
+	/// <summary>
+	/// Transforms a point by a transformation mat
+	/// </summary>
+	/// <param name="m">The transformation matrix</param>
+	/// <param name="rhs">The point to be transformed</param>
+	/// <returns></returns>
+	public static Vector3 TransformPoint(this Matrix4 m, Vector3 rhs)
     {
         Vector4 res = new();
         res.X = m.M11 * rhs.X + m.M12 * rhs.Y + m.M13 * rhs.Z + m.M14;
@@ -65,13 +68,19 @@ public static class Extensions
         return new(res.X / res.W, res.Y / res.W, res.Z / res.W);
     }
 
-    public static Position3d TransformPoint(this Matrix4 m, Position3d rhs)
+	/// <summary>
+	/// Transforms a direction by a transformation mat
+	/// </summary>
+	/// <param name="m">The transformation matrix</param>
+	/// <param name="rhs">The direction vector to be transformed</param>
+	/// <returns></returns>
+    public static Vector3 TransformDir(this Matrix4 m, Vector3 rhs)
     {
         Vector4 res = new();
         res.X = m.M11 * rhs.X + m.M12 * rhs.Y + m.M13 * rhs.Z + m.M14;
         res.Y = m.M21 * rhs.X + m.M22 * rhs.Y + m.M23 * rhs.Z + m.M24;
         res.Z = m.M31 * rhs.X + m.M32 * rhs.Y + m.M33 * rhs.Z + m.M34;
-        res.W = m.M41 * rhs.X + m.M42 * rhs.Y + m.M43 * rhs.Z + m.M44;
-        return new(res.X / res.W, res.Y / res.W, res.Z / res.W);
+        //res.W = m.M41 * rhs.X + m.M42 * rhs.Y + m.M43 * rhs.Z + m.M44;
+        return new(res.X, res.Y, res.Z);
     }
 }

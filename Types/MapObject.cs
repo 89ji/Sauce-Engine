@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Numerics;
+using OpenTK.Mathematics;
 using Sauce_Engine.Util;
 using Sauce_Engine.Numerics;
 
@@ -58,11 +58,11 @@ public abstract class MapObject
 	public Transform GetTransform() => transform;
 	public Matrix4 MakeGlModelMat()
 	{
-		Matrix4 model = Matrix4.CreateScale(GetScale.ToGlVec3());
+		Matrix4 model = Matrix4.CreateScale(GetScale);
 		model *= Matrix4.CreateRotationY(GetRotation.Y);
 		model *= Matrix4.CreateRotationX(GetRotation.X);
 		model *= Matrix4.CreateRotationZ(GetRotation.Z);
-		model *= Matrix4.CreateTranslation(GetTranslate.ToGlVec3());
+		model *= Matrix4.CreateTranslation(GetTranslate);
 		return model;
 	}
 }

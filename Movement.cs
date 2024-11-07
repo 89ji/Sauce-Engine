@@ -35,9 +35,10 @@ class Movement
     public void Process(KeyboardState input, FrameEventArgs e)
     {
         Vector3 Acceleration = new(0, gravity, 0);
+        Acceleration.Y = 0;
 
         float airControl;
-        bool Grounded = ComputeCollision(cam.Position.ToSauceCoord3d(), new Direction3d(0, -1, 0));
+        bool Grounded = colMan.CalculateRaycastInMap(cam.Position - new Vector3(0, -2, 0), new (0, -1, 0));
 
         if (Grounded)
         {
@@ -51,8 +52,8 @@ class Movement
         }
 
         // Eliminate flying from the cameras range of movement
-        var flatFront = cam.Front;
-        var flatRight = cam.Right;
+        Vector3 flatFront = cam.Front;
+        Vector3 flatRight = cam.Right;
         flatFront.Y = 0;
         flatFront.Normalize();
         flatRight.Y = 0;
@@ -63,7 +64,7 @@ class Movement
         //bool BackBlocked = ComputeCollision(cam.Position, flatFront.Normalized() * -.5f);
         //bool RightBlocked = ComputeCollision(cam.Position, flatRight.Normalized() * .5f);
         //bool LeftBlocked = ComputeCollision(cam.Position, flatRight.Normalized() * -.5f);
-        bool TopBlocked = ComputeCollision(cam.Position.ToSauceCoord3d() + new Direction3d(0f, 3f, 0f), new Direction3d(0, 1f, 0), true);
+        bool TopBlocked = false;//colMan.CalculateRaycastInMap(cam.Position + new Vector3(0f, 3f, 0f), new Vector3(0, 1, 0));
         if (TopBlocked) throw new Exception("Top blocked!");
 
         // Check inputs and move and stuff
@@ -77,6 +78,7 @@ class Movement
         if (input.IsKeyDown(Keys.Space) && Grounded) Acceleration += new Vector3(0, 1, 0) * 10f / (float)e.Time;
         if (input.IsKeyDown(Keys.LeftShift)) Acceleration -= new Vector3(0, 1, 0) * 5 / (float)e.Time;
 
+        /*
         if (moveDirection.Length > 0)
         {
             moveDirection.Normalize();
@@ -84,9 +86,10 @@ class Movement
             Matrix4 rotate90 = Matrix4.CreateFromAxisAngle(Vector3.UnitY, 90f.toDeg());
             Vector3 rightMovement = rotate90.TransformPoint(moveDirection);
 
+            
             float frontBlock = ComputeCollisionDistance(cam.Position + new Vector3(0, .25f, 0) + .25f * moveDirection, moveDirection * 2);
-            float rightExtent = ComputeCollisionDistance(cam.Position + new Vector3(0, .25f, 0) + rightMovement * slideMeasureGap - moveDirection, moveDirection * 5, true);
-            float leftExtent = ComputeCollisionDistance(cam.Position + new Vector3(0, .25f, 0) - rightMovement * slideMeasureGap - moveDirection, moveDirection * 5, true);
+            float rightExtent = ComputeCollisionDistance(cam.Position + new (0, .25f, 0) + rightMovement * slideMeasureGap - moveDirection, moveDirection * 5, true);
+            float leftExtent = ComputeCollisionDistance(cam.Position + new (0, .25f, 0) - rightMovement * slideMeasureGap - moveDirection, moveDirection * 5, true);
             if (!float.IsInfinity(frontBlock))
             {
                 float Slope;
@@ -110,12 +113,15 @@ class Movement
 
                 float theta = MathF.Atan(Slope);
                 Console.WriteLine($"left: {leftExtent} right: {rightExtent} front: {frontBlock} theta: {theta} slope: {Slope}");
+                
+
 
                 moveDirection = new Vector3();
                 Velocity.X = 0;
                 Velocity.Z = 0;
             }
         }
+        */
 
         /*
         if (Velocity.Length > 0)
@@ -154,118 +160,5 @@ class Movement
             Velocity.X *= .999f;
             Velocity.Z *= .999f;
         }
-    }
-
-    const float cLowBound = -.5f;
-    const float cHighBound = .5f;
-    const float cPadding = .5f;
-    const float playerHeight = 2;
-    bool ComputeCollision(Position3d position, Direction3d direction, bool Debug = false)
-    {
-        bool CollisionFound = false;
-        foreach (var obj in objs)
-        {
-            if (obj is Brush brush)
-            {
-                Transform transf = new Transform(brush.transform);
-                transf.RotateTo(new(-transf.Rotation.X, -transf.Rotation.Y, -transf.Rotation.Z));
-                Matrix4 trans = transf.GetMat().ToGLMat4();
-                Matrix4 arcTrans = trans.Inverted();
-
-                Position3d localPos = arcTrans.TransformPoint(position);
-                Direction3d localDir = arcTrans.TransformPoint(direction);
-
-                // For drawing the extents of each collidable brush
-                /*
-                for(float i =- .5f; i <= .5; i += .25f)
-                for(float j =- .5f; j <= .5; j += .25f)
-                for(float k =- .5f; k <= .5; k += .25f)
-                {
-                    if (i != 0 && j != 0 && k != 0) continue;
-                    Vector3 point = new(i, j, k);
-                    point = Multiply(trans, point);
-                    DrawMarker(point);
-                }*/
-
-                for (float i = 0; i <= 1; i += .05f)
-                {
-                    Position3d sample = localPos + (i * localDir);
-                    bool xInBounds = sample.X > cLowBound - (cPadding / brush.GetScale.X) && sample.X < cHighBound + (cPadding / brush.GetScale.X);
-                    bool yInBounds = sample.Y - (playerHeight / brush.GetScale.Y) > cLowBound && sample.Y - (playerHeight / brush.GetScale.Y) < cHighBound;
-                    bool zInBounds = sample.Z > cLowBound - (cPadding / brush.GetScale.Z) && sample.Z < cHighBound + (cPadding / brush.GetScale.Z);
-
-                    if (Debug)
-                    {
-                        sample = trans.TransformPoint(sample);
-                        //sample.Y -= 2;
-                        DrawMarker(sample);
-                    }
-                    if (xInBounds && yInBounds && zInBounds)
-                    {
-                        if (Debug)
-                        {
-                            sample = trans.TransformPoint(sample);
-                            //sample.Y -= 2;
-                            DrawMarker(sample);
-                        }
-                        CollisionFound = true;
-                    }
-                }
-            }
-        }
-        if (Debug) DrawMarker(position + direction);
-        return CollisionFound;
-    }
-
-    // Similar to the other function but returns +inf if no collision and the distance if found
-    float ComputeCollisionDistance(Position3d position, Direction3d direction, bool Debug = false)
-    {
-        float CollisionFound = float.PositiveInfinity;
-        foreach (var obj in objs)
-        {
-            if (obj is Brush brush)
-            {
-                Transform transf = new Transform(brush.transform);
-                transf.RotateTo(new(-transf.Rotation.X, -transf.Rotation.Y, -transf.Rotation.Z));
-                Matrix4 trans = transf.GetMat().ToGLMat4();
-                Matrix4 arcTrans = trans.Inverted();
-
-                var localPos = arcTrans.TransformPoint(position);
-                var localVel = arcTrans.TransformPoint(direction);
-
-                for (float i = 0; i <= 1; i += .05f)
-                {
-                    var sample = localPos + i * localVel;
-                    bool xInBounds = sample.X > cLowBound - (cPadding / brush.GetScale.X) && sample.X < cHighBound + (cPadding / brush.GetScale.X);
-                    bool yInBounds = sample.Y - (playerHeight / brush.GetScale.Y) > cLowBound && sample.Y - (playerHeight / brush.GetScale.Y) < cHighBound;
-                    bool zInBounds = sample.Z > cLowBound - (cPadding / brush.GetScale.Z) && sample.Z < cHighBound + (cPadding / brush.GetScale.Z);
-
-                    /*if (Debug)
-                    {
-                        sample = Multiply(trans, sample);
-                        //sample.Y -= 2;
-                        DrawMarker(sample);
-                    }*/
-                    if (xInBounds && yInBounds && zInBounds) 
-                    {
-                        DrawMarker(trans.TransformPoint(sample));
-                        CollisionFound = MathF.Min(CollisionFound, Vector.Distance(position, sample));
-                    }
-                }
-            }
-        }
-        if (Debug) DrawMarker(position + direction);
-        return CollisionFound;
-    }
-
-
-    void DrawMarker(Vector3 Location, float Size = .2f)
-    {
-        imObjList.AddMapObject(new Brush(new Transform(SysVec3.Zero, Location.ToSysVec3(), new SysVec3(Size, Size, Size))));
-    }
-
-    void DrawMarker(Position3d Location, float Size = .2f)
-    {
-        imObjList.AddMapObject(new Brush(new Transform(SysVec3.Zero, Location.ToSysVec3(), new SysVec3(Size, Size, Size))));
-    }
+    }        
 }

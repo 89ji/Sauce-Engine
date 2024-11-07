@@ -179,7 +179,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
                 switch (ent.Type)
                 {
                     case Enums.EntityType.OmniLight:
-                        _lightingShader.SetVector3($"pointLights[{oLightCt}].position", ent.transform.Translation.ToGlVec3());
+                        _lightingShader.SetVector3($"pointLights[{oLightCt}].position", ent.transform.Translation);
                         _lightingShader.SetVector3($"pointLights[{oLightCt}].ambient", new Vector3(0.05f, 0.05f, 0.05f));
                         _lightingShader.SetVector3($"pointLights[{oLightCt}].diffuse", new Vector3(0.8f, 0.8f, 0.8f));
                         _lightingShader.SetVector3($"pointLights[{oLightCt}].specular", new Vector3(1.0f, 1.0f, 1.0f));
@@ -189,8 +189,8 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
                         oLightCt++;
                         break;
                     case Enums.EntityType.DirectLight:
-                        _lightingShader.SetVector3($"spotLights[{dLightCt}].position", ent.transform.Translation.ToGlVec3());
-                        _lightingShader.SetVector3($"spotLights[{dLightCt}].direction", ent.transform.Rotation.ToGlVec3());
+                        _lightingShader.SetVector3($"spotLights[{dLightCt}].position", ent.transform.Translation);
+                        _lightingShader.SetVector3($"spotLights[{dLightCt}].direction", ent.transform.Rotation);
                         _lightingShader.SetVector3($"spotLights[{dLightCt}].ambient", new Vector3(0.0f, 0.0f, 0.0f));
                         _lightingShader.SetVector3($"spotLights[{dLightCt}].diffuse", new Vector3(1.0f, 1.0f, 1.0f));
                         _lightingShader.SetVector3($"spotLights[{dLightCt}].specular", new Vector3(1.0f, 1.0f, 1.0f));

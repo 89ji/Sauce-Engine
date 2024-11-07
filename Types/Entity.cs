@@ -1,4 +1,4 @@
-using System.Numerics;
+using OpenTK.Mathematics;
 using Sauce_Engine.Enums;
 
 namespace Sauce_Engine.Types;
