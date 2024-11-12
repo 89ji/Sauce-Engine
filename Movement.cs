@@ -19,9 +19,11 @@ class Movement
     MapObjList imObjList;
     CollisionManager colMan;
     const float gravity = -20f;
-    const float cameraSpeed = 10f * 10f;
+    const float cameraSpeed = 10f * 2f;
     const float airControlPenalty = .3f;
-    const float slideMeasureGap = .1f;
+    const float heightSlices = 1f / 20f;
+    const float playerFatness = .75f;
+    const float playerHeight = 1.75f;
 
 
 
@@ -39,7 +41,7 @@ class Movement
         Vector3 Acceleration = new(0, gravity, 0);
 
         float airControl;
-        bool Grounded = colMan.CalculateRaycastInMap(cam.Position - new Vector3(0, 2, 0), new(0, -1, 0));
+        bool Grounded = colMan.CalculateRaycastInMap(cam.Position - new Vector3(0, playerHeight, 0), new(0, -1, 0));
         //colMan.DrawRay(cam.Position - new Vector3(0, 2, 0), new (0, -1, 0));
 
         if (Grounded)
@@ -75,16 +77,51 @@ class Movement
         if (input.IsKeyDown(Keys.Space) && Grounded) Acceleration += new Vector3(0, 1, 0) * 10f / (float)e.Time;
         if (input.IsKeyDown(Keys.LeftShift)) Acceleration -= new Vector3(0, 1, 0) * 5 / (float)e.Time;
 
-
+        float newMoveSpeed = 1;
         if (moveDirection.Length > 0)
         {
             moveDirection.Normalize();
-            bool moveBlocked = colMan.CalculateRaycastInMapNormal(cam.Position, .1f * moveDirection, out Vector3 normal);
-            if (moveBlocked)
+            for (float h = 0; h <= playerHeight; h += heightSlices)
             {
-                float newMoveSpeed = Vector3.Dot(moveDirection, normal);
-            }
+                bool moveBlocked = colMan.CalculateRaycastInMapNormal(cam.Position - new Vector3(0, h, 0), playerFatness * moveDirection, out Vector3 normal);
+                if (moveBlocked)
+                {
+                    newMoveSpeed = Vector3.Dot(moveDirection, normal);
+                    if (newMoveSpeed <= 0)
+                    {
+                        moveDirection -= normal;
+                        moveDirection.Normalize();
+                        moveDirection *= newMoveSpeed;
+                    }
 
+                    float newVel = Vector3.Dot(Velocity, normal);
+                    if (newVel <= 0)
+                    {
+                        Vector3 newDir = Velocity.Normalized() + normal;
+                        Velocity = -newVel * newDir;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (Velocity.Length > 0)
+        {
+            Vector3 velDir = Velocity.Normalized();
+            for (float h = 0; h <= playerHeight; h += heightSlices)
+            {
+                bool moveBlocked = colMan.CalculateRaycastInMapNormal(cam.Position - new Vector3(0, h, 0), playerFatness * velDir, out Vector3 normal);
+                if (moveBlocked)
+                {
+                    float newVel = Vector3.Dot(Velocity, normal);
+                    if (newVel <= 0)
+                    {
+                        Vector3 newDir = Velocity.Normalized() + normal;
+                        Velocity = -newVel * newDir;
+                        break;
+                    }
+                }
+            }
         }
 
         Acceleration += moveDirection * cameraSpeed * airControl;
@@ -102,8 +139,8 @@ class Movement
 
         if (Grounded)
         {
-            Velocity.X *= .98f;
-            Velocity.Z *= .98f;
+            Velocity.X *= .95f;
+            Velocity.Z *= .95f;
         }
         else
         {

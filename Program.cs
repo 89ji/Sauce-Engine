@@ -14,7 +14,7 @@ public static class Program
 	private static void Main()
 	{
 		MapObjList mapObjects = MapObjList.Instance;
-		Deserializer.DeserializeMap(@"asdasd.map", out string Mapname);
+		Deserializer.DeserializeMap(@"exported_data.map", out string Mapname);
 
 		using Stream stream = File.OpenRead("ficon.png");
 		var img = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);

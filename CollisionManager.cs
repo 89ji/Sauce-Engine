@@ -16,13 +16,6 @@ class CollisionManager
         this.imObjList = imObjects;
     }
 
-    const float SampleDensity = 1f / 20f;
-    const float cLowBound = -.5f;
-    const float cHighBound = .5f;
-    const float cPadding = .5f;
-    const float playerHeight = 2;
-
-
     Triangle[] cubeTriangles = new Triangle[]
 {
     // Front Face (z = 0.5)
@@ -72,16 +65,22 @@ class CollisionManager
 
     public bool CalculateRaycastInMapNormal(Vector3 origin, Vector3 direction, out Vector3 normal)
     {
+        //DrawRay(origin, direction);
         normal = Vector3.Zero;
+        bool found = false;
         foreach (MapObject obj in mapObjects)
         {
             if (obj is Brush b)
             {
                 var result = CalculateRaycastNormal(origin, direction, b);
-                if (result != null) normal = result.Value;
+                if (result != null) 
+                {
+                    normal = result.Value;
+                    found = true;
+                }
             }
         }
-        return normal != Vector3.Zero;
+        return found;
     }
 
     // Crude implementation of the moller trombone algorithm
@@ -164,7 +163,7 @@ class CollisionManager
                 t < direction.Length)
             {
                 found = Vector3.Cross(P0-P1, P1-P2).Normalized();
-                DrawRay(origin + t * direction, found.Value);
+                //DrawRay(origin + t * direction, found.Value);
             }
         }
         return found;
@@ -179,7 +178,7 @@ class CollisionManager
     {
         for (float t=0; t <= 1; t+=.05f)
         {
-            DrawMarker(origin + t * direction);
+            DrawMarker(origin + t * direction, .02f);
         }
     }
 }
