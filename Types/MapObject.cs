@@ -65,4 +65,13 @@ public abstract class MapObject
 		model *= Matrix4.CreateTranslation(GetTranslate);
 		return model;
 	}
+	public Matrix4 MakeRealModelMat()
+	{
+		Matrix4 model = Matrix4.CreateScale(GetScale);
+		model *= Matrix4.CreateRotationY(-1 * GetRotation.Y);
+		model *= Matrix4.CreateRotationX(GetRotation.X);
+		model *= Matrix4.CreateRotationZ(GetRotation.Z);
+		model *= Matrix4.CreateTranslation(GetTranslate);
+		return model;
+	}
 }

@@ -13,10 +13,12 @@ using SysVec3 = System.Numerics.Vector3;
 class Movement
 {
     Camera cam;
+
+
     MapObjList objs;
     MapObjList imObjList;
     CollisionManager colMan;
-    const float gravity = -9.8f;
+    const float gravity = -20f;
     const float cameraSpeed = 10f * 10f;
     const float airControlPenalty = .3f;
     const float slideMeasureGap = .1f;
@@ -35,10 +37,10 @@ class Movement
     public void Process(KeyboardState input, FrameEventArgs e)
     {
         Vector3 Acceleration = new(0, gravity, 0);
-        Acceleration.Y = 0;
 
         float airControl;
-        bool Grounded = colMan.CalculateRaycastInMap(cam.Position - new Vector3(0, -2, 0), new (0, -1, 0));
+        bool Grounded = colMan.CalculateRaycastInMap(cam.Position - new Vector3(0, 2, 0), new(0, -1, 0));
+        //colMan.DrawRay(cam.Position - new Vector3(0, 2, 0), new (0, -1, 0));
 
         if (Grounded)
         {
@@ -60,12 +62,7 @@ class Movement
         flatRight.Normalize();
 
         // Checking collisions for movement and stuff
-        //bool FrontBlocked = ComputeCollision(cam.Position, flatFront.Normalized() * .5f);
-        //bool BackBlocked = ComputeCollision(cam.Position, flatFront.Normalized() * -.5f);
-        //bool RightBlocked = ComputeCollision(cam.Position, flatRight.Normalized() * .5f);
-        //bool LeftBlocked = ComputeCollision(cam.Position, flatRight.Normalized() * -.5f);
-        bool TopBlocked = false;//colMan.CalculateRaycastInMap(cam.Position + new Vector3(0f, 3f, 0f), new Vector3(0, 1, 0));
-        if (TopBlocked) throw new Exception("Top blocked!");
+        bool TopBlocked = colMan.CalculateRaycastInMap(cam.Position + new Vector3(0f, .25f, 0f), new Vector3(0, 1, 0));
 
         // Check inputs and move and stuff
         Vector3 moveDirection = new();
@@ -78,7 +75,7 @@ class Movement
         if (input.IsKeyDown(Keys.Space) && Grounded) Acceleration += new Vector3(0, 1, 0) * 10f / (float)e.Time;
         if (input.IsKeyDown(Keys.LeftShift)) Acceleration -= new Vector3(0, 1, 0) * 5 / (float)e.Time;
 
-        /*
+
         if (moveDirection.Length > 0)
         {
             moveDirection.Normalize();
@@ -86,10 +83,10 @@ class Movement
             Matrix4 rotate90 = Matrix4.CreateFromAxisAngle(Vector3.UnitY, 90f.toDeg());
             Vector3 rightMovement = rotate90.TransformPoint(moveDirection);
 
-            
-            float frontBlock = ComputeCollisionDistance(cam.Position + new Vector3(0, .25f, 0) + .25f * moveDirection, moveDirection * 2);
-            float rightExtent = ComputeCollisionDistance(cam.Position + new (0, .25f, 0) + rightMovement * slideMeasureGap - moveDirection, moveDirection * 5, true);
-            float leftExtent = ComputeCollisionDistance(cam.Position + new (0, .25f, 0) - rightMovement * slideMeasureGap - moveDirection, moveDirection * 5, true);
+
+            bool frontBlocked = colMan.CalculateRaycastMinDist(cam.Position + new Vector3(0, .25f, 0) + .25f * moveDirection, moveDirection * 2, out float frontBlock);
+            bool rightExtented = colMan.CalculateRaycastMinDist(cam.Position + new Vector3(0, .25f, 0) + rightMovement * slideMeasureGap - moveDirection, moveDirection * .5f, out float rightExtent);
+            bool leftExtented = colMan.CalculateRaycastMinDist(cam.Position + new Vector3(0, .25f, 0) - rightMovement * slideMeasureGap - moveDirection, moveDirection * .5f, out float leftExtent);
             if (!float.IsInfinity(frontBlock))
             {
                 float Slope;
@@ -113,7 +110,7 @@ class Movement
 
                 float theta = MathF.Atan(Slope);
                 Console.WriteLine($"left: {leftExtent} right: {rightExtent} front: {frontBlock} theta: {theta} slope: {Slope}");
-                
+
 
 
                 moveDirection = new Vector3();
@@ -121,7 +118,7 @@ class Movement
                 Velocity.Z = 0;
             }
         }
-        */
+
 
         /*
         if (Velocity.Length > 0)
@@ -160,5 +157,5 @@ class Movement
             Velocity.X *= .999f;
             Velocity.Z *= .999f;
         }
-    }        
+    }
 }

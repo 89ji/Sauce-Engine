@@ -23,50 +23,126 @@ class CollisionManager
     const float playerHeight = 2;
 
 
+    Triangle[] cubeTriangles = new Triangle[]
+{
+    // Front Face (z = 0.5)
+    new Triangle(new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(0.5f, -0.5f, 0.5f), new Vector3(0.5f, 0.5f, 0.5f)),
+    new Triangle(new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(0.5f, 0.5f, 0.5f), new Vector3(-0.5f, 0.5f, 0.5f)),
+
+    // Back Face (z = -0.5)
+    new Triangle(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(0.5f, 0.5f, -0.5f)),
+    new Triangle(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, 0.5f, -0.5f), new Vector3(0.5f, -0.5f, -0.5f)),
+
+    // Left Face (x = -0.5)
+    new Triangle(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.5f, 0.5f, 0.5f)),
+    new Triangle(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(-0.5f, 0.5f, 0.5f), new Vector3(-0.5f, 0.5f, -0.5f)),
+
+    // Right Face (x = 0.5)
+    new Triangle(new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.5f, -0.5f, 0.5f)),
+    new Triangle(new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0.5f, 0.5f, -0.5f), new Vector3(0.5f, 0.5f, 0.5f)),
+
+    // Top Face (y = 0.5)
+    new Triangle(new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.5f, 0.5f, 0.5f), new Vector3(0.5f, 0.5f, 0.5f)),
+    new Triangle(new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.5f, 0.5f, -0.5f)),
+
+    // Bottom Face (y = -0.5)
+    new Triangle(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0.5f, -0.5f, 0.5f)),
+    new Triangle(new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, -0.5f, 0.5f), new Vector3(-0.5f, -0.5f, 0.5f))
+};
+
+
     public bool CalculateRaycastInMap(Vector3 origin, Vector3 direction)
     {
+        //DrawRay(origin, direction);
+        bool found = false;
         foreach (MapObject obj in mapObjects)
         {
             if (obj is Brush b)
             {
                 var result = CalculateRaycast(origin, direction, b);
-                if (result != null) return true;
+                if (result != null) 
+                {
+                    DrawMarker(result.Value);
+                    found = true;
+                }
             }
         }
-        return false;
+        return found;
     }
 
+    public bool CalculateRaycastMinDist(Vector3 origin, Vector3 direction, out float distance)
+    {
+        distance = float.PositiveInfinity;
+        bool found = false;
+        foreach (MapObject obj in mapObjects)
+        {
+            if (obj is Brush b)
+            {
+                var result = CalculateRaycast(origin, direction, b);
+                if (result != null) 
+                {
+                    float dist = Vector3.Distance(origin, result.Value);
+                    distance = MathF.Min(distance, dist);
+                    found = true;
+                }
+            }
+        }
+        return found;
+    }
+
+    // Crude implementation of the moller trombone algorithm
     Vector3? CalculateRaycast(Vector3 origin, Vector3 direction, MapObject target)
     {
-        Transform modelTransform = new Transform(target.transform);
-        modelTransform.RotateTo(new (-modelTransform.Rotation.X, -modelTransform.Rotation.Y, -modelTransform.Rotation.Z));
-        Matrix4 trans = modelTransform.GetMat();
-        Matrix4 arcTrans = trans.Inverted();
-
-        Vector3 localPos = arcTrans.TransformPoint(origin);
-        Vector3 localDir = arcTrans.TransformDir(direction);
-        localDir.Normalize();
-
-        for (float t = 0; t <= 1; t += SampleDensity)
+        Matrix4 trans = target.MakeRealModelMat();
+        Vector3? found = null;
+        foreach (Triangle tri in cubeTriangles)
         {
-            Vector3 sample = localPos + t * localDir;
-            bool xInBounds = sample.X < -.5f && sample.X > .5f;
-            bool yInBounds = sample.Y < -.5f && sample.Y > .5f;
-            bool zInBounds = sample.Z < -.5f && sample.Z > .5f;
+            Vector3 P0 = trans.TransformDir(tri.Vertex1) + target.GetTranslate;
+            Vector3 P1 = trans.TransformDir(tri.Vertex2) + target.GetTranslate;
+            Vector3 P2 = trans.TransformDir(tri.Vertex3) + target.GetTranslate;
 
-            var pt = trans.TransformPoint(sample);
-            DrawMarker(pt, .01f);
+            //DrawMarker(P0);
+            //DrawMarker(P1);
+            //DrawMarker(P2);
 
-            if (xInBounds && yInBounds && zInBounds)
+            Vector3 E1 = P1 - P0;
+            Vector3 E2 = P2 - P0;
+
+            Vector3 S = origin - P0;
+            Vector3 S1 = Vector3.Cross(direction, E2);
+            Vector3 S2 = Vector3.Cross(S, E1);
+
+            float invDet = 1 / Vector3.Dot(S1, E1);
+            Vector3 rVec = new(Vector3.Dot(S2, E2), Vector3.Dot(S1, S), Vector3.Dot(S2, direction));
+
+            Vector3 result = invDet * rVec;
+            float t = result.X;
+            float b1 = result.Y;
+            float b2 = result.Z;
+
+            if (t >= 0 &&
+                b1 >= 0 && b1 <= 1 &&
+                b2 >= 0 && b2 <= 1 &&
+                b1 + b2 <= 1 &&
+                t < direction.Length)
             {
-                return pt;
+                //DrawMarker(origin + t * direction);
+                found = origin + t * direction;
             }
         }
-        return null;
+        return found;
     }
 
-    void DrawMarker(Vector3 Location, float Size = .2f)
+    public void DrawMarker(Vector3 Location, float Size = .2f)
     {
-        imObjList.AddMapObject(new Brush(new Transform(Vector3.Zero, Location, new (Size, Size, Size))));
+        imObjList.AddMapObject(new Brush(new Transform(Vector3.Zero, Location, new(Size, Size, Size))));
+    }
+
+    public void DrawRay(Vector3 origin, Vector3 direction)
+    {
+        for (float t=0; t <= 1; t+=.05f)
+        {
+            DrawMarker(origin + t * direction);
+        }
     }
 }

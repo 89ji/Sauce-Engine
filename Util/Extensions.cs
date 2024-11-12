@@ -65,7 +65,7 @@ public static class Extensions
         res.Y = m.M21 * rhs.X + m.M22 * rhs.Y + m.M23 * rhs.Z + m.M24;
         res.Z = m.M31 * rhs.X + m.M32 * rhs.Y + m.M33 * rhs.Z + m.M34;
         res.W = m.M41 * rhs.X + m.M42 * rhs.Y + m.M43 * rhs.Z + m.M44;
-        return new(res.X / res.W, res.Y / res.W, res.Z / res.W);
+        return new(res.X, res.Y, res.Z);
     }
 
 	/// <summary>
