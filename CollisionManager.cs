@@ -70,24 +70,18 @@ class CollisionManager
         return found;
     }
 
-    public bool CalculateRaycastMinDist(Vector3 origin, Vector3 direction, out float distance)
+    public bool CalculateRaycastInMapNormal(Vector3 origin, Vector3 direction, out Vector3 normal)
     {
-        distance = float.PositiveInfinity;
-        bool found = false;
+        normal = Vector3.Zero;
         foreach (MapObject obj in mapObjects)
         {
             if (obj is Brush b)
             {
-                var result = CalculateRaycast(origin, direction, b);
-                if (result != null) 
-                {
-                    float dist = Vector3.Distance(origin, result.Value);
-                    distance = MathF.Min(distance, dist);
-                    found = true;
-                }
+                var result = CalculateRaycastNormal(origin, direction, b);
+                if (result != null) normal = result.Value;
             }
         }
-        return found;
+        return normal != Vector3.Zero;
     }
 
     // Crude implementation of the moller trombone algorithm
@@ -128,6 +122,49 @@ class CollisionManager
             {
                 //DrawMarker(origin + t * direction);
                 found = origin + t * direction;
+            }
+        }
+        return found;
+    }
+
+    // Same moller trombone algorithm but returns the normal of the triangle instead
+    Vector3? CalculateRaycastNormal(Vector3 origin, Vector3 direction, MapObject target)
+    {
+        Matrix4 trans = target.MakeRealModelMat();
+        Vector3? found = null;
+        foreach (Triangle tri in cubeTriangles)
+        {
+            Vector3 P0 = trans.TransformDir(tri.Vertex1) + target.GetTranslate;
+            Vector3 P1 = trans.TransformDir(tri.Vertex2) + target.GetTranslate;
+            Vector3 P2 = trans.TransformDir(tri.Vertex3) + target.GetTranslate;
+
+            //DrawMarker(P0);
+            //DrawMarker(P1);
+            //DrawMarker(P2);
+
+            Vector3 E1 = P1 - P0;
+            Vector3 E2 = P2 - P0;
+
+            Vector3 S = origin - P0;
+            Vector3 S1 = Vector3.Cross(direction, E2);
+            Vector3 S2 = Vector3.Cross(S, E1);
+
+            float invDet = 1 / Vector3.Dot(S1, E1);
+            Vector3 rVec = new(Vector3.Dot(S2, E2), Vector3.Dot(S1, S), Vector3.Dot(S2, direction));
+
+            Vector3 result = invDet * rVec;
+            float t = result.X;
+            float b1 = result.Y;
+            float b2 = result.Z;
+
+            if (t >= 0 &&
+                b1 >= 0 && b1 <= 1 &&
+                b2 >= 0 && b2 <= 1 &&
+                b1 + b2 <= 1 &&
+                t < direction.Length)
+            {
+                found = Vector3.Cross(P0-P1, P1-P2).Normalized();
+                DrawRay(origin + t * direction, found.Value);
             }
         }
         return found;

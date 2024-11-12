@@ -79,60 +79,13 @@ class Movement
         if (moveDirection.Length > 0)
         {
             moveDirection.Normalize();
-
-            Matrix4 rotate90 = Matrix4.CreateFromAxisAngle(Vector3.UnitY, 90f.toDeg());
-            Vector3 rightMovement = rotate90.TransformPoint(moveDirection);
-
-
-            bool frontBlocked = colMan.CalculateRaycastMinDist(cam.Position + new Vector3(0, .25f, 0) + .25f * moveDirection, moveDirection * 2, out float frontBlock);
-            bool rightExtented = colMan.CalculateRaycastMinDist(cam.Position + new Vector3(0, .25f, 0) + rightMovement * slideMeasureGap - moveDirection, moveDirection * .5f, out float rightExtent);
-            bool leftExtented = colMan.CalculateRaycastMinDist(cam.Position + new Vector3(0, .25f, 0) - rightMovement * slideMeasureGap - moveDirection, moveDirection * .5f, out float leftExtent);
-            if (!float.IsInfinity(frontBlock))
+            bool moveBlocked = colMan.CalculateRaycastInMapNormal(cam.Position, .1f * moveDirection, out Vector3 normal);
+            if (moveBlocked)
             {
-                float Slope;
-
-                switch (float.IsInfinity(leftExtent), float.IsInfinity(rightExtent))
-                {
-                    case (true, true):
-                        Slope = 0;
-                        break;
-                    case (false, true):
-                        Slope = -4;
-                        break;
-                    case (true, false):
-                        Slope = 4;
-                        break;
-                    case (_, _):
-                        float rise = rightExtent - leftExtent;
-                        Slope = rise / (2 * slideMeasureGap);
-                        break;
-                }
-
-                float theta = MathF.Atan(Slope);
-                Console.WriteLine($"left: {leftExtent} right: {rightExtent} front: {frontBlock} theta: {theta} slope: {Slope}");
-
-
-
-                moveDirection = new Vector3();
-                Velocity.X = 0;
-                Velocity.Z = 0;
+                float newMoveSpeed = Vector3.Dot(moveDirection, normal);
             }
+
         }
-
-
-        /*
-        if (Velocity.Length > 0)
-        {
-            var velDir = Velocity.Normalized();
-            bool frontBlock = ComputeCollision(cam.Position + new Vector3(0, 1, 0) + velDir * .2f, velDir);
-            bool leftExtent = ComputeCollision(cam.Position + new Vector3(0, 1, 0) - flatRight + velDir * .2f, velDir);
-            if (frontBlock)
-            {
-                moveDirection = new Vector3();
-                Velocity.X = 0;
-                Velocity.Z = 0;
-            }
-        }*/
 
         Acceleration += moveDirection * cameraSpeed * airControl;
 
