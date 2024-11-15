@@ -32,6 +32,10 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
 
+      <None Update="asdasd.map">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+
     </ItemGroup>
 
 </Project>

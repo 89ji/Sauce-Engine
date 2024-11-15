@@ -19,7 +19,7 @@ class Movement
     MapObjList imObjList;
     CollisionManager colMan;
     const float gravity = -20f;
-    const float cameraSpeed = 10f * 2f;
+    const float cameraSpeed = 10f * 10f;
     const float airControlPenalty = .3f;
     const float heightSlices = 1f / 20f;
     const float playerFatness = .75f;
@@ -139,8 +139,8 @@ class Movement
 
         if (Grounded)
         {
-            Velocity.X *= .95f;
-            Velocity.Z *= .95f;
+            Velocity.X *= .96f;
+            Velocity.Z *= .96f;
         }
         else
         {

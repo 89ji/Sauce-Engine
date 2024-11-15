@@ -1,20 +1,35 @@
 Mapname: The name of the map goes here
-Brush: <1, 5, 0> <-0.15707967, 0, 0> <4, 2, -1> Ceiling
+Brush: <0, 9.5, 0> <0, 0, 0> <15, 0.2, 15> Ceiling
 Brush: <0, 0, 0> <0, 0, 0> <5, 0.5, 5> ConcFloor
 Brush: <5, -1, 0> <0, 0, 0> <5, 0.5, 5> ConcFloor
 Brush: <5, -1, 5> <0, 0, 0> <5, 0.5, 5> ConcFloor
 Brush: <0, -1, 5> <0, 0, 0> <5, 0.5, 5> ConcFloor
 Brush: <-5, -1, 5> <0, 0, 0> <5, 0.5, 5> ConcFloor
-Brush: <-5, -1, 0> <0, 0, 0> <5, 0.5, 5> ConcFloor
+Brush: <5, -1, -10> <0, 0, 0> <5, 0.5, 5> ConcFloor
 Brush: <-5, -1, -5> <0, 0, 0> <5, 0.5, 5> ConcFloor
 Brush: <0, -1, -5> <0, 0, 0> <5, 0.5, 5> ConcFloor
 Brush: <5, -1, -5> <0, 0, 0> <5, 0.5, 5> ConcFloor
 Brush: <0, -1.5, 0> <0, 0, 0> <15, 0.5, 15> Metal
-Brush: <0, 2.5, -2.5> <0, 0, 0> <5, 4.5, 0.01> Glass
-Brush: <0, 2.5, 2.5> <0, 0, 0> <5, 4.5, 0.01> Glass
-Brush: <2.5, 2.5, 0> <0, 1.5707964, 0> <5, 4.5, 0.01> Glass
-Brush: <-2.5, 2.5, 0> <0, 1.5707964, 0> <5, 4.5, 0.01> Glass
-Entity: <0, 4, 0> <0, 0, 0> <1, 1, 1> Omni
-Entity: <5, 4, 0> <0, 0, 0> <1, 1, 1> Omni
-Entity: <-4, 4, 0> <0, 0, 0> <1, 1, 1> Omni
-Entity: <0, 4, 5> <0, 0, 0> <1, 1, 1> Omni
+Brush: <0, 2.5, -2.4> <0, 0, 0> <5, 4.5, 0.25> Glass
+Brush: <0, 2.5, 2.4> <0, 0, 0> <5, 4.5, 0.25> Glass
+Brush: <2.4, 2.5, 0> <0, 1.5707964, 0> <5, 4.5, 0.25> Glass
+Brush: <-2.5, 4, -1.5> <0, 1.5707964, 0> <2, 1.5, 0.25> Glass
+Entity: <0, 4, 0> <0, 0, 0> Omni
+Entity: <5, 4, 0> <0, 0, 0> Omni
+Entity: <-4, 4, 0> <0, 0, 0> Omni
+Entity: <0, 4, 5> <0, 0, 0> Omni
+Entity: <0, 7, 0> <0, 0, 0> Spot
+Brush: <-5, 4.5, -10> <0, 0, 0> <5, 10.5, 5> ConcWall
+Brush: <-2.5, 2.5, 1> <0, 1.5707964, 0> <3, 4.5, 0.25> Glass
+Brush: <-2.5, 2.5, -2.5> <0, 1.5707964, 0> <0.5, 4.5, 0.25> Glass
+Brush: <-7, 4.5, 7> <0, 0.7853985, 0> <8, 10.5, 6> ConcWall
+Brush: <-5, -1, 0> <0, 0, 0> <5, 0.5, 5> ConcFloor
+Brush: <10, 4.5, -5> <0, 0, 0> <5, 10.5, 5> ConcWall
+Brush: <0, -1, -10> <0, 0, 0> <5, 0.5, 5> ConcFloor
+Brush: <7, 4.5, -10> <0, 0, 0> <5, 10.5, 5> ConcWall
+Brush: <-5, 4.5, -5> <0, 0, 0> <5, 10.5, 5> ConcWall
+Brush: <-10, 4.5, 0> <0, 0, 0> <5, 10.5, 5> ConcWall
+Brush: <0, 4.5, 10> <0, 0, 0> <5, 10.5, 5> ConcWall
+Brush: <5, 4.5, 10> <0, 0, 0> <5, 10.5, 5> ConcWall
+Brush: <10, 4.5, 5> <0, 0, 0> <5, 10.5, 5> ConcWall
+Brush: <10, 4.5, 0> <0, 0, 0> <5, 10.5, 5> ConcWall
