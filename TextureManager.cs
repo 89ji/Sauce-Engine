@@ -5,20 +5,25 @@ class TextureManager
 {
     Shader lShader;
     Dictionary<Textures, (Texture, Texture)> TexMap;
+    Dictionary<Textures, Texture> NormalMap;
+    Texture DefaultNormal;
     public TextureManager(Shader lShader)
     {
         TexMap = new();
+        NormalMap = new();
         this.lShader = lShader;
 
         Texture concFloor = Texture.LoadFromFile(@"Resources/concrete_tile.jpg");
         Texture concFloorSpec = Texture.LoadFromFile(@"Resources/concrete_tile spec.jpg");
+        Texture concFloorNormal = Texture.LoadFromFile(@"Resources/concrete_tile normal.png");
         TexMap.Add(Textures.ConcFloor, (concFloor, concFloorSpec));
+        NormalMap.Add(Textures.ConcFloor, concFloorNormal);
 
         Texture concWall = Texture.LoadFromFile(@"Resources/concrete wall.jpg");
         Texture concWallSpec = Texture.LoadFromFile(@"Resources/concrete wall spec.jpg");
         TexMap.Add(Textures.ConcWall, (concWall, concWallSpec));
 
-        Texture glass = Texture.LoadFromFile(@"Resources/glass.jpg");
+        Texture glass = Texture.LoadFromFile(@"Resources/glass w trans.png");
         TexMap.Add(Textures.Glass, (glass, glass));
 
         Texture concDark = Texture.LoadFromFile(@"Resources/conc dark.jpg");
@@ -39,14 +44,16 @@ class TextureManager
         Texture inConc = Texture.LoadFromFile(@"Resources/inConcFloor.jpg");
         Texture inConcSpec = Texture.LoadFromFile(@"Resources/inConcFloorSpec.jpg");
         TexMap.Add(Textures.IndoorConcFloor, (inConc, inConcSpec));
-        
+
         Texture carpet = Texture.LoadFromFile(@"Resources/carpet.jpg");
         Texture carpetSpec = Texture.LoadFromFile(@"Resources/carpet spec.jpg");
         TexMap.Add(Textures.Carpet, (carpet, carpetSpec));
 
         Texture ceiling = Texture.LoadFromFile(@"Resources/ceiling.jpg");
         Texture ceilingSpec = Texture.LoadFromFile(@"Resources/ceiling spec.jpg");
+        Texture ceilingNormal = Texture.LoadFromFile(@"Resources/ceiling normal.png");
         TexMap.Add(Textures.Ceiling, (ceiling, ceilingSpec));
+        NormalMap.Add(Textures.Ceiling, ceilingNormal);
 
         Texture brickWall = Texture.LoadFromFile(@"Resources/brick wall.jpg");
         Texture brickWallSpec = Texture.LoadFromFile(@"Resources/brick wall spec.jpg");
@@ -58,8 +65,12 @@ class TextureManager
 
         Texture crate = Texture.LoadFromFile(@"Resources/crate.png");
         Texture crateSpec = Texture.LoadFromFile(@"Resources/crate spec.png");
+        Texture crateNormal = Texture.LoadFromFile(@"Resources/crate normal.png");
         TexMap.Add(Textures.Crate, (crate, crateSpec));
+        NormalMap.Add(Textures.Crate, crateNormal);
 
+
+        DefaultNormal = Texture.LoadFromFile(@"Resources/default normal.png");
     }
 
     public void SwapToTexture(Textures target)
@@ -68,6 +79,9 @@ class TextureManager
         var textures = TexMap[target];
         textures.Item1.Use(TextureUnit.Texture0);
         textures.Item2.Use(TextureUnit.Texture1);
+
+        if (NormalMap.ContainsKey(target)) NormalMap[target].Use(TextureUnit.Texture2);
+        else DefaultNormal.Use(TextureUnit.Texture2);
     }
 }
 

@@ -6,6 +6,7 @@
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D normal;
     float     shininess;
 };
 
@@ -74,8 +75,13 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
 {
+    if(texture(material.diffuse, TexCoords).a < .1) discard;
+
     //properties
-    vec3 norm = normalize(Normal);
+    //vec3 norm = normalize(Normal);
+    vec3 norm = texture(material.normal, TexCoords).rgb;
+    norm = normalize(norm * 2.0 - 1.0);
+
     vec3 viewDir = normalize(viewPos - FragPos);
 
     //phase 1: Directional lighting
@@ -89,7 +95,9 @@ void main()
     for(int i = 0; i < NR_SPOT_LIGHTS; i++)
         result += CalcSpotLight(spotLights[i], norm, FragPos, viewDir);    
 
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, texture(material.diffuse, TexCoords).a );
+
+    float asdads = texture(material.normal, TexCoords).z;
 }
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)

@@ -89,9 +89,14 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
     {
         base.OnLoad();
 
+        GLFW.WindowHint(WindowHintInt.Samples, 4);        
+
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
         GL.Enable(EnableCap.DepthTest);
+        GL.Enable(EnableCap.Multisample);
+        GL.Enable(EnableCap.Blend);
+        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
         _vertexBufferObject = GL.GenBuffer();
         GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
@@ -144,6 +149,8 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
         GL.BindVertexArray(_vaoModel);
 
         texMan.SwapToTexture(Textures.Crate);
+        mapObjects.eyepos = _camera.Position;
+        imObjects.eyepos = _camera.Position;
 
         _lightingShader.Use();
 
@@ -154,6 +161,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
 
         _lightingShader.SetInt("material.diffuse", 0);
         _lightingShader.SetInt("material.specular", 1);
+        _lightingShader.SetInt("material.normal", 2);
         _lightingShader.SetVector3("material.specular", new Vector3(0.5f, 0.5f, 0.5f));
         _lightingShader.SetFloat("material.shininess", 32.0f);
 
