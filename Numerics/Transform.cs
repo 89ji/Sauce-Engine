@@ -103,6 +103,16 @@ public class Transform
         return Matrix;
     }
 
+    public Matrix4 MakeTbnMat()
+    {
+        Matrix4 composedRotation =
+        ConstructRotationMatrix(Rotation.Y, Dimension.Y) *
+        ConstructRotationMatrix(Rotation.X, Dimension.X) *
+        ConstructRotationMatrix(Rotation.Z, Dimension.Z);
+
+        return composedRotation;
+    }
+
     private Matrix4 ConstructRotationMatrix(float angle, Dimension axis)
     {
         float cos = MathF.Cos(angle);

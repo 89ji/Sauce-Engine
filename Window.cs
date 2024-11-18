@@ -220,6 +220,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
                 texMan.SwapToTexture(b.texture);
                 Matrix4 model = b.MakeGlModelMat();
                 _lightingShader.SetMatrix4("model", model);
+                _lightingShader.SetMatrix4("tbn", model);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
             }
         }
@@ -296,6 +297,13 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
         base.OnMouseWheel(e);
 
         _camera.Fov -= e.OffsetY;
+    }
+
+    protected override void OnKeyDown(KeyboardKeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        if (e.Key == Keys.Minus) _camera.Fov -= 5;
+        else if (e.Key == Keys.Equal) _camera.Fov += 5;
     }
 
     protected override void OnResize(ResizeEventArgs e)

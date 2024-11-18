@@ -65,6 +65,7 @@ out vec4 FragColor;
 in vec3 Normal;
 in vec3 FragPos;
 in vec2 TexCoords;
+in mat4 tbnMat;
 
 //Here we have some function prototypes, these are the signatures the gpu will use to know how the
 //parameters of each light calculation is layed out.
@@ -81,6 +82,8 @@ void main()
     //vec3 norm = normalize(Normal);
     vec3 norm = texture(material.normal, TexCoords).rgb;
     norm = normalize(norm * 2.0 - 1.0);
+    norm = vec3(vec4(norm, 0) * tbnMat);
+    norm = normalize(norm);
 
     vec3 viewDir = normalize(viewPos - FragPos);
 
