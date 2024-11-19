@@ -89,7 +89,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
     {
         base.OnLoad();
 
-        GLFW.WindowHint(WindowHintInt.Samples, 4);        
+        GLFW.WindowHint(WindowHintInt.Samples, 16);
 
         GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 
@@ -220,7 +220,7 @@ public class Window(GameWindowSettings gameWindowSettings, NativeWindowSettings 
                 texMan.SwapToTexture(b.texture);
                 Matrix4 model = b.MakeGlModelMat();
                 _lightingShader.SetMatrix4("model", model);
-                _lightingShader.SetMatrix4("tbn", model);
+                //_lightingShader.SetMatrix4("tbn", model);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
             }
         }

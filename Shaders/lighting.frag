@@ -65,11 +65,13 @@ out vec4 FragColor;
 in vec3 Normal;
 in vec3 FragPos;
 in vec2 TexCoords;
-in mat4 tbnMat;
+in mat3 InvModel;
 
 //Here we have some function prototypes, these are the signatures the gpu will use to know how the
 //parameters of each light calculation is layed out.
 //We have one function per light, since this makes it so we dont have to take up to much space in the main function.
+
+vec3 FixNormals(vec3 mapped, vec3 orig, mat3 inv);
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
@@ -80,27 +82,56 @@ void main()
 
     //properties
     //vec3 norm = normalize(Normal);
+
     vec3 norm = texture(material.normal, TexCoords).rgb;
     norm = normalize(norm * 2.0 - 1.0);
-    norm = vec3(vec4(norm, 0) * tbnMat);
-    norm = normalize(norm);
+    //norm = normalize(norm);
+    //norm = normalize(Normal);
 
     vec3 viewDir = normalize(viewPos - FragPos);
 
+    //phase 0: fix the normal directions :sob:
+    norm = FixNormals(norm, Normal, InvModel);
+
+    vec3 realNormal = normalize(Normal * InvModel);
+
     //phase 1: Directional lighting
     vec3 result = CalcDirLight(dirLight, norm, viewDir);
+    vec3 nResult = CalcDirLight(dirLight, realNormal, viewDir);
 
     //phase 2: Point lights
     for(int i = 0; i < NR_POINT_LIGHTS; i++)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
 
+    for(int i = 0; i < NR_POINT_LIGHTS; i++)
+        nResult += CalcPointLight(pointLights[i], realNormal, FragPos, viewDir);
+
     //phase 3: Spot light
     for(int i = 0; i < NR_SPOT_LIGHTS; i++)
-        result += CalcSpotLight(spotLights[i], norm, FragPos, viewDir);    
+        result += CalcSpotLight(spotLights[i], norm, FragPos, viewDir);
 
-    FragColor = vec4(result, texture(material.diffuse, TexCoords).a );
+    for(int i = 0; i < NR_SPOT_LIGHTS; i++)
+        nResult += CalcSpotLight(spotLights[i], realNormal, FragPos, viewDir);       
 
-    float asdads = texture(material.normal, TexCoords).z;
+    FragColor = vec4(.7 * result + .3 * nResult, texture(material.diffuse, TexCoords).a );
+
+    //float asdads = texture(material.normal, TexCoords).z;
+}
+
+vec3 FixNormals(vec3 mapped, vec3 orig, mat3 inv)
+{
+    if(orig.z == -1.0) mapped = -mapped;
+    if(orig.x == 1.0)
+    {
+        // z to x
+        // x to -z
+        float temp = mapped.x;
+        mapped.x = -mapped.z;
+        mapped.z = temp;
+    }
+
+
+    return normalize(vec3(mapped * inv));
 }
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)

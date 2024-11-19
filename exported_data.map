@@ -6,8 +6,8 @@ Brush: <0, -7, 0> <0, 0, 0> <50, .1, 50> Glass
 Brush: <0, 3, 0> <0, 0, 0> <50, .1, 25> Ceiling
 Brush: <20, -6, 20> <0, 0, 0> <10, 4, 10> BrickWall
 Brush: <1, 1, 1> <0, 0, 0> <4, .3, 4> ConcDark
-Entity: <0, 0, 0> <0, 0, 0> Omni
-Entity: <-15, 0, 15> <0, 0, 0> Omni
-Entity: <15, 0, -15> <0, 0, 0> Omni
-Entity: <-15, 0, -15> <0, 0, 0> Omni
-Entity: <-15, 0, -15> <0, 0, 0> Spot
+Entity: <0, -2, 0> <0, 0, 0> Omni
+Entity: <-15, 20, 15> <0, 0, 0> Omni
+Entity: <15, 22, -15> <0, 0, 0> Omni
+Entity: <-15, 22, -15> <0, 0, 0> Omni
+Entity: <-15, 220, -15> <0, 0, 0> Spot
